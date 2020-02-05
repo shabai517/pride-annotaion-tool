@@ -6,10 +6,11 @@ import store from './store'
 Vue.config.productionTip = false
 
 import ViewUI from 'view-design';
+import locale from 'view-design/dist/locale/en-US';
 import 'view-design/dist/styles/iview.css';
 import VueResource  from 'vue-resource'
 
-Vue.use(ViewUI);
+Vue.use(ViewUI, { locale });
 Vue.use(VueResource);
 
 new Vue({

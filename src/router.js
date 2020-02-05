@@ -18,6 +18,11 @@ export default new Router({
       component: Login,
 
     },
+    {
+      path:'/annotation',
+      name: 'annotation',
+      component: Annotation,
+    },
     // {
     //   path:'/annotation/:id/check',
     //   name: 'check',

@@ -21,7 +21,6 @@
                   <p slot="title">Search</p>
                   <div class="search-container">
                       <div class="search-input">
-                         
                           <div class="search-input-wrapper">
                               <div class="fake-input">
                                 <div class="tag-wrapper">
@@ -38,24 +37,10 @@
                                         style="width:500px">
                                         <Option v-for="(item, index) in autoCompleteArray" :value="item" :key="index">{{item}}</Option>
                                     </Select>
-                                    <!--<Input class="tag-input" v-model="keyword" placeholder="input here" style="width: 500px;"></Input>-->
                                 </div>
                                 <Icon type="ios-search"></Icon>
                               </div>
                           </div>
-                          <!--
-                          <AutoComplete
-                              class="archive-search-input"
-                              v-model="keyword"
-                              @on-search="keywordSearch"
-   
-                              icon="ios-search"
-                              :filter-method="autoCompleteFilter"
-                              placeholder="input here"
-                              style="width: 100%" 
-                              size="large">
-                          </AutoComplete>
-                        -->
                       </div>
                       <div class="search-filter">
                           <div class="filter-wrapper">
@@ -79,9 +64,8 @@
                                   </Select>
                               </div>
                           </div>
-
                           <div class="search-button">
-                              <a class="button search-button" @click="submitSearch">Search</a>
+                              <Button type="primary" @click="submitSearch">Search</Button>
                           </div>
                       </div>
                       <div class="search-condition-container">
@@ -114,16 +98,6 @@
                 <Card>
                     <p slot="title" class="resource-list-title-container">
                       <span>Resources List</span>
-                      <!--new api has no sort function
-                      <span>
-                          <span>Sort by: </span>
-                          <div class="sortOption">
-                              <Select v-model="sortType" size="small" style="width:95px" @on-change="sortChange">
-                                  <Option v-for="item in sortList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                              </Select>
-                          </div>
-                      </span>
-                      -->
                     </p>
                     <Spin size="large" fix v-if="loading"></Spin>
                     <Card v-for="publicationItem in publicaitionList" class="resource-item" v-bind:key = "publicationItem.accession">
@@ -135,7 +109,7 @@
                           <!--<read-more class="readMore" more-str="(More)" :text="publicationItem.projectDescription" link="#" less-str="Less" :max-chars="200"></read-more>-->
                         </span>
                         <p><span class="project-info">{{projectItemsPublicationDate}}: </span><text-highlight :queries="highlightKeyword" :caseSensitive="HighlightKeywordSensitive">{{publicationItem.publicationDate}}</text-highlight></p>
-                        <Dropdown class="dataset-wrapper" v-for="(datesetItem, index) in publicationItem.projectTags" :key="index">
+                        <div class="dataset-wrapper" v-for="(datesetItem, index) in publicationItem.projectTags" :key="index">
                             <a v-if="datesetItem == 'Biological'" class="button biological-dataset-button" href="javascript:void(0)">
                                <Icon type="ios-pricetag"></Icon>
                                 <text-highlight :queries="highlightKeyword" :caseSensitive="HighlightKeywordSensitive">{{datesetItem}}</text-highlight> Dataset
@@ -156,10 +130,7 @@
                                <Icon type="ios-pricetag"></Icon>
                                 <text-highlight :queries="highlightKeyword" :caseSensitive="HighlightKeywordSensitive">{{datesetItem}}</text-highlight> Dataset Dataset
                             </a>
-                            <DropdownMenu slot="list">
-                                <DropdownItem>{{datesetItem}} Dataset</DropdownItem>
-                            </DropdownMenu>
-                        </Dropdown>
+                        </div>
                         <Collapse v-if="hightlightMode">
                             <Panel>
                                 <span>Matched Items</span>
@@ -200,8 +171,8 @@
             highlightKeyword:'',
             HighlightKeywordSensitive:false,
             facetsURL: this.$store.state.baseApiURL + '/facet/projects',
-            searchConfigURL: this.$store.state.baseURL + '/static/config/facets/config.json', 
-            projectItemsConfigURL: this.$store.state.baseURL + '/static/config/projectItems/config.json',
+            searchConfigURL: 'config/facets/config.json', 
+            projectItemsConfigURL: 'config/projectItems/config.json',
             queryArchiveProjectListApi: this.$store.state.baseApiURL + '/search/projects',
             autoCompleteApi: this.$store.state.baseApiURL + '/search/autocomplete?keyword=',
             fieldSelectors:[],
@@ -814,10 +785,6 @@
     computed:{
       //this variable is not used anymore and only for updating this.normalQuery;
       query:function(){
-          //let keyword= this.keyword? 'keyword='+this.keyword+'&' : '';
-          //let filter = this.filter? 'filter='+this.filter+'&' : '';
-          //let page='page='+this.page+'&';
-          //let pageSize='pageSize='+this.pageSize;
           let normalQuery = {}
           for(let i=0; i<this.tagArray.length; i++){
 
@@ -828,8 +795,6 @@
             normalQuery.filter = this.filter;
           normalQuery.page = this.page;
           normalQuery.pageSize = this.pageSize;
-          //console.log('this.normalQuery',this.normalQuery);
-          //return '?'+keyword+filter+page+pageSize;
           return normalQuery; 
       }
     },
@@ -898,16 +863,16 @@
   .search-input-wrapper .fake-input{
     padding-right: 32px;
     border-radius: 3px !important;
-        font-size: 14px;
+    font-size: 14px;
     padding: 6px 7px;
     height: 36px;
     display: flex;
     align-items: center;
     width: 100%;
     line-height: 1.5;
-        border: 1px solid #5bc0be;
-            color: #495060;
-                background-color: #fcfcfc;
+    border: 1px solid #2d8cf0;
+    color: #495060;
+    background-color: #fcfcfc;
     background-image: none;
     cursor: text;
     text-align:left;
@@ -1035,6 +1000,10 @@
   }
   .dataset-wrapper{
     margin-right: 5px;
+    display: inline-block;
+  }
+  .dataset-wrapper a{
+    color: white
   }
   .dropdown-action{
     width: 50px;
@@ -1089,7 +1058,7 @@
       margin-bottom: 0 !important;
     }
     .filter-selector .ivu-select-item-selected{
-      color: rgba(91, 192, 190, 0.9) !important;
+      color: #2d8cf0 !important;
       background: inherit !important;
     }
     .filter-selector .ivu-checkbox-wrapper{
@@ -1099,6 +1068,9 @@
     .filter-selector .ivu-select-input{
       margin-bottom: 0;
       box-shadow: none;
+      height: 30px;
+      line-height: 30px;
+      top:0;
     }
     .filter-selector .ivu-select-input:focus{
           border: none;
@@ -1117,10 +1089,6 @@
     .tag-container .ivu-tag-border.ivu-tag-closable:after{
         /*display: none !important;*/
     }
-    .filter-selector .ivu-select-input{
-      height: 30px;
-      line-height: 30px;
-    }
     .filter-selector .ivu-tag{
       display: none;
       margin:2px 4px 2px 0;
@@ -1130,7 +1098,6 @@
     }
     .filter-selector.input-search-needed .ivu-select-dropdown{
       width: 200px !important;
-      left:243px !important;
     }
     .filter-selector .ivu-icon-ios-close-empty{
       display: none;

@@ -12,12 +12,12 @@
               </FormItem>
               <FormItem prop="password">
                 <Input :type="passwordType" v-model="formInline.password" placeholder="Password">
-                <Icon type="ios-locked-outline" slot="prepend" size="14"></Icon>
+                <Icon type="ios-lock-outline" slot="prepend" size="14"></Icon>
                 </Input>
               </FormItem>
               <div class="login-action">
                 <Checkbox @on-change="passwordTypeChange">Show Password</Checkbox>
-                <a @click="forgotPassword">Forgot Password</a>
+                <!-- <a @click="forgotPassword">Forgot Password</a> -->
               </div>
               <FormItem>
                 <Button type="primary" @click="login('formInline')" long>Log in</Button>
@@ -54,66 +54,67 @@
             //NavBar,
         },
         methods:{
-           login(name) {
-              this.$refs[name].validate((valid) => {
-                  if (!valid) {
-                    this.$Message.error({ content: 'Format Invalid' });
-                    return
-                  }
-                  this.$Spin.show({
-                    render: (h) => {
-                      return h('div', [
-                        h('Icon', {
-                          'class': 'demo-spin-icon-load',
-                          props: {
-                            type: 'ios-loading',
-                            size: 18
-                          }
-                        }),
-                        h('div', 'Loading')
-                      ])
-                    }
-                  });
-                  console.log(this.tokenApi)
-                  this.$http
-                        //.post(this.tokenApi + '?username='+this.formInline.user+'&password='+this.formInline.password)
-                        .post(this.tokenApi,
-                            {Credentials:
-                              {
-                                username:this.formInline.user,
-                                password:this.formInline.password
-                              }
-                            })
-                        .then(function(res){
-                              this.loginModalBool=false;
-                              localStorage.setItem('username',this.formInline.user);
-                              localStorage.setItem('token',res.bodyText);
-                              //this.username = this.formInline.user;
-                              this.$store.commit('setUser',{username: this.formInline.user, token:res.bodyText});
-                              this.$Message.success({ content: 'Login Success' })
-                              this.$Spin.hide()
-                              this.$refs[name].resetFields();
-                              this.gotoProfile();
-                        }).catch(err=>{
-                          console.log(err);
-                          this.$Spin.hide()
-                          this.$Message.error({ content: 'Invalid Username or Password'});
-                        });
-              })
-           },
-           passwordTypeChange(type){
-              if(type)
-                this.passwordType="text";
-              else
-                this.passwordType="password"
-              //console.log(type)
-            },
-            gotoProfile(){
-              this.$router.push({ name: 'profile', params: {id: this.$store.state.username.split('@')[0] }});
-            },
-            forgotPassword(){
-                this.$router.push({ name: 'forgotpassword'});
-            },
+              login(name) {
+                  // this.$refs[name].validate((valid) => {
+                  //     if (!valid) {
+                  //       this.$Message.error({ content: 'Format Invalid' });
+                  //       return
+                  //     }
+                  //     this.$Spin.show({
+                  //       render: (h) => {
+                  //         return h('div', [
+                  //           h('Icon', {
+                  //             'class': 'demo-spin-icon-load',
+                  //             props: {
+                  //               type: 'ios-loading',
+                  //               size: 18
+                  //             }
+                  //           }),
+                  //           h('div', 'Loading')
+                  //         ])
+                  //       }
+                  //     });
+                  //     console.log(this.tokenApi)
+                  //     this.$http
+                  //           //.post(this.tokenApi + '?username='+this.formInline.user+'&password='+this.formInline.password)
+                  //           .post(this.tokenApi,
+                  //               {Credentials:
+                  //                 {
+                  //                   username:this.formInline.user,
+                  //                   password:this.formInline.password
+                  //                 }
+                  //               })
+                  //           .then(function(res){
+                  //                 this.loginModalBool=false;
+                  //                 localStorage.setItem('username',this.formInline.user);
+                  //                 localStorage.setItem('token',res.bodyText);
+                  //                 //this.username = this.formInline.user;
+                  //                 this.$store.commit('setUser',{username: this.formInline.user, token:res.bodyText});
+                  //                 this.$Message.success({ content: 'Login Success' })
+                  //                 this.$Spin.hide()
+                  //                 this.$refs[name].resetFields();
+                  //                 this.gotoAnnotation();
+                  //           }).catch(err=>{
+                  //             console.log(err);
+                  //             this.$Spin.hide()
+                  //             this.$Message.error({ content: 'Invalid Username or Password'});
+                  //           });
+                  // })
+                  this.gotoAnnotation()
+              },
+              passwordTypeChange(type){
+                if(type)
+                  this.passwordType="text";
+                else
+                  this.passwordType="password"
+              },
+              gotoAnnotation(){
+                this.$router.push({ name: 'annotation'});
+                //this.$router.push({ name: 'profile', params: {id: this.$store.state.username.split('@')[0] }});
+              },
+              forgotPassword(){
+                  this.$router.push({ name: 'forgotpassword'});
+              },
         },
         mounted:function(){
              //this.$refs['formInline'].resetFields();
@@ -141,7 +142,6 @@
     .login-action{
       display: flex;
       justify-content: space-between;
-      margin-top: -10px;
       margin-bottom: 50px;
       color:#454548 !important;
     }
