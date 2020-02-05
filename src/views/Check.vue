@@ -1,6 +1,5 @@
 <template>
   <div class="check-container">
-      <div class="panel nav"><NavBar/></div>
       <div class="browse-data-container">
           <Row>
               <div class="title">
@@ -21,7 +20,7 @@
                 <Card>
                     <p slot="title" class="resource-list-title-container">
                       <span>Project {{accession}}</span>
-                      <Icon v-if="editProjectBool" type="android-done" @click="saveProject" size="25" color="#5bc0be"></Icon>
+                      <Icon v-if="editProjectBool" type="android-done" @click="saveProject" size="25" color="#2d8cf0"></Icon>
                       <Icon v-else type="edit" @click="editProject" size="20" ></Icon>
                     </p>
                     <div class="card-content">
@@ -218,10 +217,10 @@
                 </Card>
                 <div class="button-wrapper">
                     <div class="search-button">
-                        <a class="button search-button" @click="back">Back</a>
+                        <Button type="primary" @click="back">Back</Button>
                     </div>
                     <div class="search-button">
-                        <a class="button search-button" @click="next">Next</a>
+                        <Button type="primary" @click="next">Next</Button>
                     </div>
                 </div>
               </Row>
@@ -231,8 +230,8 @@
 </template>
 
 <script>
-  import NavBar from '@/components/ebi/Nav'
-  import store from "@/store/store.js"
+  //import NavBar from '@/components/ebi/Nav'
+  import store from "@/store.js"
   export default {
     name: 'check',
     data(){
@@ -298,7 +297,7 @@
                         }
                         else if (params.row.type == 'SEARCH'){
                           className ='fas fa-search';
-                          iconColor='#5bc0be'
+                          iconColor='#2d8cf0'
                         }
                         return h('div', [
 
@@ -421,7 +420,7 @@
       next();
     },
     components: {
-      NavBar,
+      //NavBar,
     },
     methods:{
       showDataset(id){
@@ -583,11 +582,11 @@
     },
     beforeRouteEnter(to,from,next){
         next(vm=>{
-          let username = localStorage.getItem('username') || '';
-          if(!username){
-            vm.$Message.error({content:'Please Login', duration:2})
-            vm.$router.push({name:'annotation'})
-          }
+          // let username = localStorage.getItem('username') || '';
+          // if(!username){
+          //   vm.$Message.error({content:'Please Login', duration:2})
+          //   vm.$router.push({name:'annotation'})
+          // }
         });
     }
   }
@@ -597,6 +596,13 @@
 <style scoped>  
   .check-container{
     width: 100%;
+  }
+  .check-container a{
+    color:#2c3e50 !important;
+    border-bottom: 1px black dotted;
+  }
+  .check-container a:hover{
+    color:#2d8cf0;
   }
   .title{
     font-size: 35px;
@@ -611,7 +617,7 @@
   }
   .summary-content-header{
     font-size: 14px;
-    color: #5bc0be;
+    color: #2d8cf0;
     font-weight: bold;
   }
   .button-wrapper{
@@ -643,7 +649,7 @@
         /*padding: 20px 85px;
         font-size: 24px;*/
         font-weight: 700;
-        background-color: #5bc0be;
+        background-color: #2d8cf0;
         border-radius: 3px;
     }
     .readMore{
@@ -651,13 +657,13 @@
     }
     .card-content .step-title{
       font-size: 14px;
-      color: #5bc0be;
+      color: #2d8cf0;
       font-weight: bold;
       margin:15px 0 0 0;
     }
     .modal-column-name{
       font-size: 14px;
-      color: #5bc0be;
+      color: #2d8cf0;
       font-weight: bold;
       margin-bottom: 15px;
     }
@@ -677,14 +683,14 @@
       padding: 0px;
     }
     .readMore a{
+        font-size: 12px;
         color: #495060;
-        border-bottom-style: dotted;
+        border-bottom: 1px black dotted;
     }
     .readMore a:hover{
-        color: #5bc0be;
+        color: #2d8cf0;
     }
     .readMore span{
         display: block;
-        margin-top: 15px;
     }
 </style>

@@ -105,8 +105,7 @@
                         <p class="resource-title"><text-highlight :queries="highlightKeyword" :caseSensitive="HighlightKeywordSensitive">{{publicationItem.title}}</text-highlight></p> 
                         <p><span class="project-info">{{projectItemsSpecies}}: </span> <span v-for="item in publicationItem.species"><text-highlight :queries="highlightKeyword" :caseSensitive="HighlightKeywordSensitive">{{item}}</text-highlight></span></p>
                         <span><span class="project-info">{{projectItemsProjectDescription}}: </span><text-highlight :queries="highlightKeyword" :caseSensitive="HighlightKeywordSensitive">{{publicationItem.projectDescription}}</text-highlight>
-                          <a @click="gotoDetails(publicationItem.accession)">(More)</a>
-                          <!--<read-more class="readMore" more-str="(More)" :text="publicationItem.projectDescription" link="#" less-str="Less" :max-chars="200"></read-more>-->
+                          <a @click="showDataset(publicationItem.accession)">(More)</a>
                         </span>
                         <p><span class="project-info">{{projectItemsPublicationDate}}: </span><text-highlight :queries="highlightKeyword" :caseSensitive="HighlightKeywordSensitive">{{publicationItem.publicationDate}}</text-highlight></p>
                         <div class="dataset-wrapper" v-for="(datesetItem, index) in publicationItem.projectTags" :key="index">
@@ -759,7 +758,6 @@
       },
       localStorageCheck(){
           var projectAccession = localStorage.getItem("projectAccession");
-          console.log('projectAccession',projectAccession);
           if(projectAccession)
               this.$Modal.confirm({
                   title: 'Uncompleted Annotaion',

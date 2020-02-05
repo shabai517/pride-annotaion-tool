@@ -3,8 +3,7 @@ import Router from 'vue-router'
 
 const Login = () => import('./views/Login.vue')
 const Annotation = () => import('./views/Annotation.vue')
-
-// const Check = () => import('./views/Check.vue')
+const Check = () => import('./views/Check.vue')
 // const Sample = () => import('./views/Sample.vue')
 // const Annotate = () => import('./views/Annotate.vue')
 
@@ -23,11 +22,11 @@ export default new Router({
       name: 'annotation',
       component: Annotation,
     },
-    // {
-    //   path:'/annotation/:id/check',
-    //   name: 'check',
-    //   component: Check,
-    // },
+    {
+      path:'/annotation/:id/check',
+      name: 'check',
+      component: Check,
+    },
     // {
     //   path:'/annotation/:id/sample',
     //   name: 'sample',
