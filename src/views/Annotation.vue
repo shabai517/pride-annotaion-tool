@@ -926,17 +926,8 @@
     color: #495060;
     border:none;
   }
-  .search-button a{
-      padding: 8px 10px;
-      font-size: 12px;
-      width: 100%;
-      margin-bottom: 0;
-      margin-top: 5px;
-      /*padding: 20px 85px;
-      font-size: 24px;*/
-      font-weight: 700;
-      background-color: #5bc0be;
-      border-radius: 3px;
+  .search-button button{
+    width: 85px;
   }
   .resource-item{
     margin-bottom: 20px;

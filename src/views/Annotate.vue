@@ -1,6 +1,6 @@
 <template>
   <div class="annotate-container">
-      <div class="panel nav"><NavBar/></div>
+      <!-- <div class="panel nav"><NavBar/></div> -->
       <div class="browse-data-container">
           <Row>
               <div class="title">
@@ -21,14 +21,14 @@
                 <selfTable class="sample-class-table"></selfTable>
                 <div class="button-wrapper">
                     <div class="search-button">
-                        <a class="button search-button" @click="back">Back</a>
+                        <Button type="primary" @click="back">Back</Button>
                     </div>
                     <div class="annotation-page">
                       <Page :total="total" :page-size="pageSize" size="small" show-total @on-change="pageChange"></Page>
                     </div>
                     <div class="search-button right">
-                        <a class="button search-button" @click="annotationSave">Save</a>
-                        <a class="button search-button" @click="annotationConfirm">Confirm</a>
+                        <Button type="primary" @click="annotationSave">Save</Button>
+                        <Button type="primary" @click="annotationConfirm">Confirm</Button>
                     </div>
                 </div>
               </Row>
@@ -38,9 +38,8 @@
 </template>
 
 <script>
-  import NavBar from '@/components/ebi/Nav'
-  import store from "@/store/store.js"
-  import selfTable from './table.vue'
+  //import NavBar from '@/components/ebi/Nav'
+  import selfTable from '@/components/table.vue'
   var paramsFromLandingPage='';
   export default {
     name: 'annotate',
@@ -61,7 +60,7 @@
       next();
     },
     components: {
-      NavBar,
+      //NavBar,
       selfTable
     },
     methods:{
@@ -136,18 +135,18 @@
     beforeDestroy(){
           
     },
-    beforeRouteEnter(to,from,next){
-      //console.log('from',from);
-      if(from.name == 'landingpage' && from.params.keyword)
-        paramsFromLandingPage = from.params.keyword;
-      next(vm=>{
-        let username = localStorage.getItem('username') || '';
-        if(!username){
-          vm.$Message.error({content:'Please Login', duration:2})
-          vm.$router.push({name:'annotation'})
-        }
-      });
-    }
+    // beforeRouteEnter(to,from,next){
+    //   //console.log('from',from);
+    //   if(from.name == 'landingpage' && from.params.keyword)
+    //     paramsFromLandingPage = from.params.keyword;
+    //   next(vm=>{
+    //     let username = localStorage.getItem('username') || '';
+    //     if(!username){
+    //       vm.$Message.error({content:'Please Login', duration:2})
+    //       vm.$router.push({name:'annotation'})
+    //     }
+    //   });
+    // }
   }
 </script>
 
@@ -169,11 +168,13 @@
     display: flex;
     justify-content: space-between;
   }
-  .button-wrapper .search-button{
-    width: 70px;
+  .search-button.right{
+    display: flex;
+    width: 180px;
+    justify-content: space-between;
   }
-  .button-wrapper .search-button.right{
-    width: auto;
+  .search-button button{
+    width: 85px;
   }
   .browse-data-container{
     width: 80%;
@@ -182,16 +183,6 @@
   }
   .input-number{
     width: 60px;
-  }
-  .search-button a{
-      padding: 8px 10px;
-      font-size: 12px;
-      width: 100%;
-      margin-bottom: 0;
-      margin-top: 5px;
-      font-weight: 700;
-      background-color: #5bc0be;
-      border-radius: 3px;
   }
   .modal-column-name{
     font-size: 14px;

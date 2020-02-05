@@ -625,12 +625,6 @@
     display: flex;
     justify-content: space-between;
   }
-  .button-wrapper .search-button{
-    width: 70px;
-  }
-  .button-wrapper .search-button.right{
-    width: auto;
-  }
   .browse-data-container{
     width: 80%;
     margin:0 auto;
@@ -640,18 +634,9 @@
     display: flex;
     justify-content: space-between;
   }
-  .search-button a{
-        padding: 8px 10px;
-        font-size: 12px;
-        width: 100%;
-        margin-bottom: 0;
-        margin-top: 5px;
-        /*padding: 20px 85px;
-        font-size: 24px;*/
-        font-weight: 700;
-        background-color: #2d8cf0;
-        border-radius: 3px;
-    }
+  .search-button button{
+    width: 85px;
+  }
     .readMore{
       display: inline;
     }

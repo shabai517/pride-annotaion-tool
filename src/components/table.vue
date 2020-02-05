@@ -5,13 +5,13 @@
             <span>Sample</span>
           </p>
           <p slot="extra" class="sample-table-extra">
-            <span class="icon-hint-text">Add Property</span><Icon type="plus-round" @click="showModal" size="20"></Icon>
-            <span class="icon-hint-text">Add Sample</span><Icon class="add-row-icon" type="plus-round" @click="addRow" size="20"></Icon>
+            <a @click="showModal"><span>Add Property</span><Icon type="ios-add" size="20"></Icon></a>
+            <a @click="addRow"><span>Add Sample</span><Icon class="add-row-icon" type="ios-add" size="20"></Icon></a>
           </p>
           <div class="card-content">
               <div class="draggable-class">
                   <div class="table-col" v-for="(itemCol,i) in sampleCol" :key="itemCol.key">
-                      <div class="table-row first handle"><Icon v-if="itemCol.key!='accession'" class="icon-in-th-left" type="ios-minus-outline" @click="removeAll(itemCol.key,'sampledata')" size="14"></Icon>{{itemCol.name}}<Icon class="icon-in-th-right" type="ios-close-outline" v-if="!itemCol.required" @click="deleteCol(itemCol,i)" size="14"></Icon></div>
+                      <div class="table-row first handle"><Icon v-if="itemCol.key!='accession'" class="icon-in-th-left" type="ios-remove-circle-outline" @click="removeAll(itemCol.key,'sampledata')" size="14"></Icon>{{itemCol.name}}<Icon class="icon-in-th-right" type="ios-remove-circle-outline" v-if="!itemCol.required" @click="deleteCol(itemCol,i)" size="14"></Icon></div>
                       <div class="table-row" v-for="(itemRow,j) in sampleData.slice(rowStart,rowEnd)">
                             <div v-if="itemCol.key!='accession'">
                                   <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-change="labelQuery(itemCol,itemRow)" @on-focus="focus($event,itemCol,itemRow,'sampledata',j)" @on-blur="inputBlur(itemRow[itemCol.key])">
@@ -29,7 +29,7 @@
                             </div>
                             <div v-else>
                                 <div class="accession-col">
-                                    <Icon v-if="sampleData.length>1 && j == sampleData.length-1" class="icon-in-row" type="ios-close-outline" @click="deleteRow(itemRow,j)" size="14"></Icon>
+                                    <Icon v-if="sampleData.length>1 && j == sampleData.length-1" class="icon-in-row" type="ios-remove-circle-outline" @click="deleteRow(itemRow,j)" size="14"></Icon>
                                     <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-change="labelQuery(itemCol,itemRow)" @on-blur="inputBlur(itemRow[itemCol.key])">
                                     </Input>
                                     <!-- <span>{{itemRow.accession}}</span> -->
@@ -39,7 +39,7 @@
                       </div>
                   </div>
                   <div class="table-col" v-for="(itemCol,i) in msRunCol" :key="itemCol.key">
-                      <div class="table-row first msrun"><Icon v-if="itemCol.key!='fractionid'" class="icon-in-th-left" type="ios-minus-outline" @click="removeAll(itemCol.key,'msrundata')" size="14"></Icon>{{itemCol.name}}</div>
+                      <div class="table-row first msrun"><Icon v-if="itemCol.key!='fractionid'" class="icon-in-th-left" type="ios-remove-circle-outline" @click="removeAll(itemCol.key,'msrundata')" size="14"></Icon>{{itemCol.name}}</div>
                       <div class="table-row" v-for="(itemRow,j) in msRunArray.slice(rowStart,rowEnd)" :key="j" :class="{hideRow:itemRow.disable}">
                             <div v-if="itemCol.key=='label' || itemCol.key=='labelReagent'">
                             <!--<div v-if="itemCol.key=='label'">-->
@@ -131,10 +131,10 @@
 </template>
 
 <script>
-  import draggable from 'vuedraggable'
-  import { ModelSelect } from 'vue-search-select'
-  import store from "@/store/store.js"
-  import { Base64 } from 'js-base64';
+  //import draggable from 'vuedraggable'
+  //import { ModelSelect } from 'vue-search-select'
+  import store from "@/store.js"
+  //import { Base64 } from 'js-base64';
   export default {
     name: 'archive',
     data(){
@@ -316,8 +316,8 @@
       }
     },
     components: {
-      draggable,
-      ModelSelect
+      //draggable,
+      //ModelSelect
     },
     methods:{
           getSampleAttributes(){
@@ -1199,7 +1199,7 @@
       font-size: 12px;
   }
   .table-row:first-child.msrun{
-      background-color: #75bfbecf;
+      background-color: #2d8cf0ba;
   }
   .table-row{
       border-bottom: 1px solid #e9eaec;
@@ -1337,17 +1337,19 @@
       display: flex;
       align-items: center;
   }
+  .sample-table-extra a{
+    color: #999;
+    display: flex;
+    align-items: center;
+  }
+  .sample-table-extra a:first-child{
+    margin-right: 5px;
+  }
+  .sample-table-extra a:hover{
+    color:#2d8cf0;
+  }
   .sample-table-extra span{
       font-size: 12px;
-      color: #999;
-      margin:0 10px;
-  }
-  .sample-table-extra.add-row-icon{
-      margin-top: 10px;
-  }
-  .sample-table-extra i:hover{
-    cursor: pointer;
-    opacity:0.6;
   }
   .tooltip-content{
       white-space: normal

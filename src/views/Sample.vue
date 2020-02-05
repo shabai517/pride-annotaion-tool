@@ -1,6 +1,6 @@
 <template>
   <div class="sample-container">
-      <div class="panel nav"><NavBar/></div>
+      <!-- <div class="panel nav"><NavBar/></div> -->
       <div class="browse-data-container">
           <Row>
               <div class="title">
@@ -84,10 +84,10 @@
                 </Card>
                 <div class="button-wrapper">
                     <div class="search-button">
-                        <a class="button search-button" @click="back">Back</a>
+                        <Button type="primary" @click="back">Back</Button>
                     </div>
                     <div class="search-button">
-                        <a class="button search-button" @click="next">Next</a>
+                        <Button type="primary" @click="next">Next</Button>
                     </div>
                 </div>
               </Row>
@@ -98,7 +98,7 @@
 </template>
 
 <script>
-  import NavBar from '@/components/ebi/Nav'
+  // import NavBar from '@/components/ebi/Nav'
   export default {
     name: 'sample',
     data(){
@@ -158,7 +158,7 @@
       next();
     },
     components: {
-      NavBar,
+      //NavBar,
     },
     methods:{
       back(){
@@ -268,12 +268,12 @@
       console.log('from',from);
       if(from.name != 'check')
         next(vm=>{
-          let username = localStorage.getItem('username') || '';
-          if(!username){
-            vm.$Message.error({content:'Please Login', duration:2})
-            vm.$router.push({name:'annotation'})
-          }
-          vm.init();
+          // let username = localStorage.getItem('username') || '';
+          // if(!username){
+          //   vm.$Message.error({content:'Please Login', duration:2})
+          //   vm.$router.push({name:'annotation'})
+          // }
+          // vm.init();
         });
       else
         next();
@@ -299,12 +299,6 @@
     display: flex;
     justify-content: space-between;
   }
-  .button-wrapper .search-button{
-    width: 70px;
-  }
-  .button-wrapper .search-button.right{
-    width: auto;
-  }
   .browse-data-container{
     width: 80%;
     margin:0 auto;
@@ -324,21 +318,12 @@
     display: flex;
     justify-content: space-between;
   }
-  .search-button a{
-        padding: 8px 10px;
-        font-size: 12px;
-        width: 100%;
-        margin-bottom: 0;
-        margin-top: 5px;
-        /*padding: 20px 85px;
-        font-size: 24px;*/
-        font-weight: 700;
-        background-color: #5bc0be;
-        border-radius: 3px;
-    }
+  .search-button button{
+    width: 85px;
+  }
   .card-content .step-title{
     font-size: 14px;
-    color: #5bc0be;
+    color: #2d8cf0;
     font-weight: bold;
     margin:15px 0 0 0;
   }
@@ -356,7 +341,7 @@
     justify-content: center;
     align-items: center;
     border: 1px solid;
-    border-color: #5bc0be;
+    border-color: #2d8cf0;
     border-radius: 6px;
     /*background-color: #207a79;*/
     margin: 15px;
@@ -379,7 +364,7 @@
     margin-bottom: 15px;
   }
   .human-check{
-    background-color: #5bc0be;
+    background-color: #2d8cf0;
   }
   .human-check:before{
     content: "H";
@@ -401,7 +386,7 @@
     margin-bottom: 15px;
   }
   .vertebrates-check{
-    background-color: #5bc0be;
+    background-color: #2d8cf0;
   }
   .vertebrates-check:before{
     content: "M";
@@ -417,21 +402,21 @@
       display: block;
       width: 64px;
       height: 64px;
-      background: url(../../../static/font/expsprite.png);
+      background: url(/font/expsprite.png);
       background-size: 128px !important;
       background-color: transparent;
       background-position: 0 -311px;
       margin-bottom: 15px;
   }
   .cellline-check{
-    background-color: #5bc0be;
+    background-color: #2d8cf0;
   }
   .cellline-check:before{
       content: " ";
       display: block;
       width: 64px;
       height: 64px;
-      background: url(../../../static/font/expsprite.png);
+      background: url(/font/expsprite.png);
       background-size: 128px !important;
       background-color: transparent;
       background-position: -64px -311px;
@@ -447,7 +432,7 @@
       margin-bottom: 15px;
   } 
   .plant-check{
-      background-color: #5bc0be;
+      background-color: #2d8cf0;
   }
   .plant-check:before{
       content: "P";
@@ -468,7 +453,7 @@
       margin-bottom: 15px;
   }
   .questionmark-check{
-      background-color: #5bc0be;
+      background-color: #2d8cf0;
   }
   .questionmark-check:before{
       content: "?";
@@ -484,22 +469,22 @@
   }
   @font-face {
       font-family: 'EBI-Generic';
-      src:url('../../../static/font/EBI-Generic.eot');
-      src:url('../../../static/font/EBI-Generic.eot?#iefix') format('embedded-opentype'),
-          url('../../../static/font/EBI-Generic.woff2') format('woff2'),
-          url('../../../static/font/EBI-Generic.woff') format('woff'),
-          url('../../../static/font/EBI-Generic.ttf') format('truetype');
+      src:url('/public/font/EBI-Generic.eot');
+      src:url('/public/font/EBI-Generic.eot?#iefix') format('embedded-opentype'),
+          url('/public/font/EBI-Generic.woff2') format('woff2'),
+          url('/public/font/EBI-Generic.woff') format('woff'),
+          url('/public/font/EBI-Generic.ttf') format('truetype');
       font-weight: normal;
       font-style: normal;
     }
     /* Icons for commonly referenced species and orgamisms */
     @font-face {
       font-family: 'EBI-Species';
-      src:url('../../../static/font/EBI-Species.eot');
-      src:url('../../../static/font/EBI-Species.eot?#iefix') format('embedded-opentype'),
-          url('../../../static/font/EBI-Species.woff2') format('woff2'),
-          url('../../../static/font/EBI-Species.woff') format('woff'),
-          url('../../../static/font/EBI-Species.ttf') format('truetype');
+      src:url('/public/font/EBI-Species.eot');
+      src:url('/public/font/EBI-Species.eot?#iefix') format('embedded-opentype'),
+          url('/public/font/EBI-Species.woff2') format('woff2'),
+          url('/public/font/EBI-Species.woff') format('woff'),
+          url('/public/font/EBI-Species.ttf') format('truetype');
       font-weight: normal;
       font-style: normal;
     }
