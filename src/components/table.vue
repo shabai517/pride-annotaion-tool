@@ -163,40 +163,54 @@
                   key: 'name',
               },
               {
-                  title: 'cvLabel',
+                  title: '',
                   key: 'cvLabel',
-                  width:0.1,
-                  className:'new-col-table', 
+                  width:1,
+                  render:(h,params)=>{
+                    return h('div')
+                  }
+                  // width:0.1,
+                  // className:'new-col-table', 
               },
               {
-                  title: 'accession',
+                  title: '',
                   key: 'accession',
-                  width:0.1,
-                  className:'new-col-table' 
+                  width:1,
+                  render:(h,params)=>{
+                    return h('div')
+                  }
+                  // width:0.1,
+                  // className:'new-col-table' 
               },
               {
-                  title: 'required',
+                  title: '',
                   key: 'required',
-                  width:0.1,
-                  className:'new-col-table' 
+                  width:1,
+                  render:(h,params)=>{
+                    return h('div')
+                  }
+                  // width:0.1,
+                  // className:'new-col-table' 
               },
               {
-                  title: 'name',
-                  key: 'name',
-                  width:0.1,
-                  className:'new-col-table' 
-              },
-              {
-                  title: 'orignalname',
+                  title: '',
                   key: 'orignal_name',
-                  width:0.1,
-                  className:'new-col-table' 
+                  width:1,
+                  render:(h,params)=>{
+                    return h('div')
+                  }
+                  // width:0.1,
+                  // className:'new-col-table' 
               },
               {
-                  title: 'key',
+                  title: '',
                   key: 'key',
-                  width:0.1,
-                  className:'new-col-table' 
+                  width:1,
+                  render:(h,params)=>{
+                    return h('div')
+                  }
+                  // width:0.1,
+                  // className:'new-col-table' 
               }
           ],
           newData:[],
