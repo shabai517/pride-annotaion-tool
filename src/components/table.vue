@@ -8,82 +8,87 @@
             <a @click="showModal"><span>Add Property</span><Icon type="ios-add" size="20"></Icon></a>
             <a @click="addRow"><span>Add Sample</span><Icon class="add-row-icon" type="ios-add" size="20"></Icon></a>
           </p>
-          <div class="card-content" @scroll="scroll">
-              <div :style="{'padding-top': rowStart*45+'px'}"></div>
-              <div class="table-col" v-for="(itemCol,i) in sampleCol" :key="itemCol.key">
-                  <div class="table-row first handle"><Icon v-if="itemCol.key!='accession'" class="icon-in-th-left" type="ios-remove-circle-outline" @click="removeAll(itemCol.key,'sampledata')" size="14"></Icon>{{itemCol.name}}<Icon class="icon-in-th-right" type="ios-remove-circle-outline" v-if="!itemCol.required" @click="deleteCol(itemCol,i)" size="14"></Icon></div>
-                  <div class="table-row" v-for="(itemRow,j) in sampleData.slice(rowStart,rowEnd)">
-                        <div v-if="itemCol.key!='accession'">
-                              <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-change="getLabel(itemCol,itemRow)" @on-focus="focus($event,itemCol,itemRow,'sampledata',j)" @on-blur="inputBlur(itemRow[itemCol.key])">
-                              </Input>
-                              <!-- <Dropdown class="dropdown-remote" trigger="custom" :visible="itemRow[itemCol.key].dropdown" placement="bottom-end" @on-click="dropdownClick($event,itemRow[itemCol.key])" @on-clickoutside="blur(itemRow[itemCol.key])">
-                                  <DropdownMenu slot="list">
-                                      <DropdownItem v-if="dropdownOptions.length == 0" name="nodata">No data
-                                          <Icon class="apply-all-button" type="arrow-down-a" size="15" @click.stop="applyAll('no data',itemCol,itemRow,'sampledata',j)"></Icon>
-                                      </DropdownItem>
-                                      <DropdownItem v-for="item in dropdownOptions" :name="item.name" :key="item.name">{{item.name}}
-                                          <Icon class="apply-all-button" type="arrow-down-a" size="15" @click.stop="applyAll(item.name,itemCol,itemRow,'sampledata',j)"></Icon>
-                                      </DropdownItem>
-                                  </DropdownMenu>
-                              </Dropdown> -->
-                        </div>
-                        <div v-else>
-                            <div class="accession-col">
-                                <Icon v-if="sampleData.length>1 && j == sampleData.length-1" class="icon-in-row" type="ios-remove-circle-outline" @click="deleteRow(itemRow,j)" size="14"></Icon>
-                                <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-change="getLabel(itemCol,itemRow)" @on-blur="inputBlur(itemRow[itemCol.key])">
-                                </Input>
-                                <!-- <span>{{itemRow.accession}}</span> -->
+          <div  class="card-content" @scroll="scroll">
+              <div v-if="sampleColQueryState && !tableLoading">
+                  <div :style="{'padding-top': rowStart*45+'px'}"></div>
+                  <div class="table-col" v-for="(itemCol,i) in sampleCol" :key="itemCol.key">
+                      <div class="table-row first handle"><Icon v-if="itemCol.key!='accession'" class="icon-in-th-left" type="ios-remove-circle-outline" @click="removeAll(itemCol.key,'sampledata')" size="14"></Icon>{{itemCol.name}}<Icon class="icon-in-th-right" type="ios-remove-circle-outline" v-if="!itemCol.required" @click="deleteCol(itemCol,i)" size="14"></Icon></div>
+                      <div class="table-row" v-for="(itemRow,j) in sampleData.slice(rowStart,rowEnd)">
+                            <div v-if="itemCol.key!='accession'">
+                                  <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-change="getLabel(itemCol,itemRow)" @on-focus="focus($event,itemCol,itemRow,'sampledata',j)" @on-blur="inputBlur(itemRow[itemCol.key])">
+                                  </Input>
+                                  <!-- <Dropdown class="dropdown-remote" trigger="custom" :visible="itemRow[itemCol.key].dropdown" placement="bottom-end" @on-click="dropdownClick($event,itemRow[itemCol.key])" @on-clickoutside="blur(itemRow[itemCol.key])">
+                                      <DropdownMenu slot="list">
+                                          <DropdownItem v-if="dropdownOptions.length == 0" name="nodata">No data
+                                              <Icon class="apply-all-button" type="arrow-down-a" size="15" @click.stop="applyAll('no data',itemCol,itemRow,'sampledata',j)"></Icon>
+                                          </DropdownItem>
+                                          <DropdownItem v-for="item in dropdownOptions" :name="item.name" :key="item.name">{{item.name}}
+                                              <Icon class="apply-all-button" type="arrow-down-a" size="15" @click.stop="applyAll(item.name,itemCol,itemRow,'sampledata',j)"></Icon>
+                                          </DropdownItem>
+                                      </DropdownMenu>
+                                  </Dropdown> -->
                             </div>
-                        </div>
-                        <div class="copy-icon"><Icon @click="showCopyModal(itemRow[itemCol.key],itemCol.key,j)" type="ios-copy-outline" size="16"></Icon></div>
-                  </div>
-              </div>
-              <div class="table-col" v-for="(itemCol,i) in msRunCol" :key="itemCol.key">
-                  <div class="table-row first msrun"><Icon v-if="itemCol.key!='fractionid'" class="icon-in-th-left" type="ios-remove-circle-outline" @click="removeAll(itemCol.key,'msrundata')" size="14"></Icon>{{itemCol.name}}</div>
-                  <div class="table-row" v-for="(itemRow,j) in msRunArray.slice(rowStart,rowEnd)" :key="j" :class="{hideRow:itemRow.disable}">
-                        <div v-if="itemCol.key=='label' || itemCol.key=='labelReagent'">
-                        <!--<div v-if="itemCol.key=='label'">-->
-                              <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-change="getLabel(itemCol,itemRow)" @on-focus="focus($event,itemCol,itemRow,'msrundata',j)" @on-blur="inputBlur(itemRow[itemCol.key])"></Input>
-                              <!-- <Dropdown class="dropdown-remote" trigger="custom" :visible="itemRow[itemCol.key].dropdown" placement="bottom-end" @on-click="dropdownClick($event,itemRow[itemCol.key])" @on-clickoutside="blur(itemRow[itemCol.key])">
-                                  <DropdownMenu slot="list">
-                                      <DropdownItem v-if="dropdownOptions.length == 0" name="nodata">No data
-                                          <Icon class="apply-all-button" type="arrow-down-a" size="15" @click.stop="applyAll('no data',itemCol,itemRow,'msrundata',j)"></Icon>
-                                      </DropdownItem>
-                                      <DropdownItem v-for="item in dropdownOptions" :name="item.name" :key="item.name">{{item.name}}
-                                          <Icon class="apply-all-button" type="arrow-down-a" size="15" @click.stop="applyAll(item.name,itemCol,itemRow,'msrundata',j)"></Icon>
-                                      </DropdownItem>
-                                  </DropdownMenu>
-                              </Dropdown> -->
-                        </div>
-                        <div v-else-if="itemCol.key=='msrun'">
-                          <div class="msRun-button-wrapper" v-if="itemRow[itemCol.key].value">
-                              <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-blur="inputBlur(itemRow[itemCol.key])"></Input>
-                              <!-- <Tooltip max-width="200" class="show-button-tooltip" placement="right">
-                                  <a class="button search-button finish" @click="showMsRunTable(itemRow,j)">Finish</a> 
-                                  <div class="tooltip-content" slot="content">
-                                      {{itemRow[itemCol.key].file}}
-                                  </div>
-                              </Tooltip>
-                              <Icon color="rgba(0, 0, 0, 0.6)" type="ios-close"  size="16" style="margin-left:5px" @click="itemRow[itemCol.key].file=''"/> -->
-                          </div>
-                          <div v-else>
-                                <Button @click="showMsRunTable(itemRow,j)" long>Edit</Button> 
-                          </div>
-                        </div>
-                        <div v-else>
-                            <div class="accession-col">
-                              <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-change="getLabel(itemCol,itemRow)"  @on-blur="inputBlur(itemRow[itemCol.key])"></Input>
-                              <!-- <span>{{itemRow.fractionid.value}}</span> -->
+                            <div v-else>
+                                <div class="accession-col">
+                                    <Icon v-if="sampleData.length>1 && j == sampleData.length-1" class="icon-in-row" type="ios-remove-circle-outline" @click="deleteRow(itemRow,j)" size="14"></Icon>
+                                    <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-change="getLabel(itemCol,itemRow)" @on-blur="inputBlur(itemRow[itemCol.key])">
+                                    </Input>
+                                    <!-- <span>{{itemRow.accession}}</span> -->
+                                </div>
                             </div>
-                        </div>
-                        <div class="copy-icon"><Icon @click="showCopyModal(itemRow[itemCol.key],itemCol.key,j)" type="ios-copy-outline" size="16"></Icon></div>
+                            <div class="copy-icon"><Icon @click="showCopyModal(itemRow[itemCol.key],itemCol.key,j)" type="ios-copy-outline" size="16"></Icon></div>
+                      </div>
                   </div>
+                  <div class="table-col" v-for="(itemCol,i) in msRunCol" :key="itemCol.key">
+                      <div class="table-row first msrun"><Icon v-if="itemCol.key!='fractionid'" class="icon-in-th-left" type="ios-remove-circle-outline" @click="removeAll(itemCol.key,'msrundata')" size="14"></Icon>{{itemCol.name}}</div>
+                      <div class="table-row" v-for="(itemRow,j) in msRunArray.slice(rowStart,rowEnd)" :key="j" :class="{hideRow:itemRow.disable}">
+                            <div v-if="itemCol.key=='label' || itemCol.key=='labelReagent'">
+                            <!--<div v-if="itemCol.key=='label'">-->
+                                  <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-change="getLabel(itemCol,itemRow)" @on-focus="focus($event,itemCol,itemRow,'msrundata',j)" @on-blur="inputBlur(itemRow[itemCol.key])"></Input>
+                                  <!-- <Dropdown class="dropdown-remote" trigger="custom" :visible="itemRow[itemCol.key].dropdown" placement="bottom-end" @on-click="dropdownClick($event,itemRow[itemCol.key])" @on-clickoutside="blur(itemRow[itemCol.key])">
+                                      <DropdownMenu slot="list">
+                                          <DropdownItem v-if="dropdownOptions.length == 0" name="nodata">No data
+                                              <Icon class="apply-all-button" type="arrow-down-a" size="15" @click.stop="applyAll('no data',itemCol,itemRow,'msrundata',j)"></Icon>
+                                          </DropdownItem>
+                                          <DropdownItem v-for="item in dropdownOptions" :name="item.name" :key="item.name">{{item.name}}
+                                              <Icon class="apply-all-button" type="arrow-down-a" size="15" @click.stop="applyAll(item.name,itemCol,itemRow,'msrundata',j)"></Icon>
+                                          </DropdownItem>
+                                      </DropdownMenu>
+                                  </Dropdown> -->
+                            </div>
+                            <div v-else-if="itemCol.key=='msrun'">
+                              <div class="msRun-button-wrapper" v-if="itemRow[itemCol.key].value">
+                                  <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-blur="inputBlur(itemRow[itemCol.key])"></Input>
+                                  <!-- <Tooltip max-width="200" class="show-button-tooltip" placement="right">
+                                      <a class="button search-button finish" @click="showMsRunTable(itemRow,j)">Finish</a> 
+                                      <div class="tooltip-content" slot="content">
+                                          {{itemRow[itemCol.key].file}}
+                                      </div>
+                                  </Tooltip>
+                                  <Icon color="rgba(0, 0, 0, 0.6)" type="ios-close"  size="16" style="margin-left:5px" @click="itemRow[itemCol.key].file=''"/> -->
+                              </div>
+                              <div v-else>
+                                    <Button @click="showMsRunTable(itemRow,j)" long>Edit</Button> 
+                              </div>
+                            </div>
+                            <div v-else>
+                                <div class="accession-col">
+                                  <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-change="getLabel(itemCol,itemRow)"  @on-blur="inputBlur(itemRow[itemCol.key])"></Input>
+                                  <!-- <span>{{itemRow.fractionid.value}}</span> -->
+                                </div>
+                            </div>
+                            <div class="copy-icon"><Icon @click="showCopyModal(itemRow[itemCol.key],itemCol.key,j)" type="ios-copy-outline" size="16"></Icon></div>
+                      </div>
+                  </div>
+                  <div :style="{'padding-top': (sampleData.length-rowEnd)*45+'px'}"></div>
+                  <div class="sample-table-extra add-row-icon">
+                    <!--  <Icon class="add-row-icon" type="plus-round" @click="addRow" size="20"></Icon><span>Add Sample</span> -->
+                  </div>
+                  <div :style="{'padding-top': rowStart*30+'px'}"></div>
               </div>
-              <div :style="{'padding-top': (sampleData.length-rowEnd)*45+'px'}"></div>
-              <div class="sample-table-extra add-row-icon">
-                <!--  <Icon class="add-row-icon" type="plus-round" @click="addRow" size="20"></Icon><span>Add Sample</span> -->
+              <div v-else-if="!sampleColQueryState && !tableLoading" class="no-data-table-wrapper">
+                  <span>No data</span>
               </div>
-              <div :style="{'padding-top': rowStart*30+'px'}"></div>
           </div>
           <Dropdown class="dropdown-remote" :style="{left:dropdown.left + 'px', top:dropdown.top + 'px'}" trigger="custom" :visible="dropdown.visible" placement="bottom-end" @on-click="dropdownClick($event,dropdown.row[dropdown.col.key])">
               <DropdownMenu slot="list">
@@ -133,9 +138,7 @@
 
 <script>
   //import draggable from 'vuedraggable'
-  //import { ModelSelect } from 'vue-search-select'
   import store from "@/store.js"
-  //import { Base64 } from 'js-base64';
   
   export default {
     name: 'archive',
@@ -242,6 +245,7 @@
           ],
           msRunModalTableData:[],
           sampleCol:[],
+          sampleColQueryState:false,
           sampleData:[],
           dropdownOptions:[],
           experimentType:'',
@@ -320,6 +324,8 @@
     },
     methods:{
           async getSampleAttributes(){
+              this.tableLoading=true
+              this.sampleColQueryState=false
               this.sampleData=[];
               this.sampleCol=[
                   {
@@ -330,6 +336,8 @@
               ];
               try{
                   let res = await this.$Api.getSampleAttributes()
+                  this.tableLoading = false
+                  this.sampleColQueryState=true
                   let sampleDataItem={};//temp sampledata item for table rows
                   for(let i=0; i<res.body.length; i++){
                       if(res.body[i].first == this.experimentType){
@@ -380,6 +388,8 @@
                   }
               }
               catch(e){
+                  this.tableLoading = false
+                  this.sampleColQueryState=false
                   console.log(e.message)
               }
           },
@@ -421,7 +431,7 @@
                   }
                   clearTimeout(this.timeoutId);
                   this.timeoutId = 0;
-                  this.timeoutId = setTimeout( ()=> {
+                  this.timeoutId = setTimeout( async()=> {
                       try{
                           let res = await this.$Api.getLabel(query)
                           if(this.timeoutId == 0)
@@ -447,7 +457,7 @@
                 }
                 clearTimeout(this.timeoutId);
                 this.timeoutId = 0;
-                this.timeoutId = setTimeout( ()=> {
+                this.timeoutId = setTimeout( async()=> {
                     try{
                         let res = await this.$Api.getLabelReagent(query)
                         if(this.timeoutId == 0)
@@ -474,7 +484,7 @@
                   }
                   clearTimeout(this.timeoutId);
                   this.timeoutId = 0;
-                  this.timeoutId = setTimeout( ()=> {
+                  this.timeoutId = setTimeout( async()=> {
                     try{
                         let res = await this.$Api.getMSRunTableData(query) 
                         if(this.timeoutId == 0)
@@ -502,7 +512,7 @@
                 }
                 clearTimeout(this.timeoutId);
                 this.timeoutId = 0;
-                this.timeoutId = setTimeout( ()=> {
+                this.timeoutId = setTimeout( async()=> {
                       try{
                           let res = await this.$Api.getValuesByAttributes(query) 
                           if(this.timeoutId == 0)
@@ -1342,6 +1352,12 @@
     justify-content: center;
     align-items: center;
     background-color: #f7f7f78f;
+  }
+  .no-data-table-wrapper{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
   }
 </style>
 
