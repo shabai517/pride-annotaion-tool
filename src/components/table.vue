@@ -383,73 +383,6 @@
                   console.log(e.message)
               }
           },
-          // getSampleAttributes(){
-          //       this.sampleData=[];
-          //       this.sampleCol=[
-          //           {
-          //               name:'Accession',
-          //               key:'accession',
-          //               required:true,
-          //           },
-          //       ];
-          //       this.$http
-          //             .get(this.getSampleAttributesApi)
-          //             .then((res)=>{
-          //                 console.log(res.body);
-          //                 let sampleDataItem={};//temp sampledata item for table rows
-          //                 for(let i=0; i<res.body.length; i++){
-
-          //                     if(res.body[i].first == this.experimentType){
-          //                         let item = {
-          //                           experimentType:res.body[i].first,
-          //                           required: res.body[i].second == 'REQUIRED'? true:false,
-          //                           cvLabel:res.body[i].third.cvLabel.toLowerCase(),
-          //                           accession:res.body[i].third.accession,
-          //                           name:this.titleCase(res.body[i].third.name),
-          //                           orignal_name:res.body[i].third.name,
-          //                           key: this.titleCase(res.body[i].third.name).toLowerCase().replace(/\s/ig,''),
-          //                         }
-          //                         //we are creating sample table columns
-          //                         if(item.required)
-          //                           this.sampleCol.push(item);
-          //                         this.newData.push(item);
-          //                         //we are creating sample table rows
-          //                         //sampleDataItem.accession={};//we will apply for the value for ac
-          //                         sampleDataItem[item.key]={
-          //                             value:'',
-          //                             dropdown:false,
-          //                             accession:'null',
-          //                             accessionKey:this.accessionKey,
-          //                             cvLabel:'null',
-          //                             col:item,
-          //                             icon:'',
-          //                             checked:true,
-          //                         }
-          //                     }
-          //                 }
-          //                 let projectAccession = localStorage.getItem("projectAccession")
-          //                 if(!projectAccession){
-          //                     for(let k=0; k<this.sampleNumber * this.fractionNumber; k++){
-          //                           let item = JSON.parse(JSON.stringify(sampleDataItem))
-          //                           item.accession={
-          //                               value:"PXD_S"+(k+1),
-          //                               dropdown:false,
-          //                               accession:'null',
-          //                               accessionKey:this.accessionKey++,
-          //                               cvLabel:'null',
-          //                               col:this.sampleCol[0],
-          //                               icon:'',
-          //                               checked:true,
-          //                           }
-          //                           //if(item.col.required)
-          //                             this.sampleData.push(item)
-          //                     }    
-          //                 }
-          //                 //this.rowEnd = this.sampleData.length;
-          //             },function(err){
-                          
-          //             });
-          // },
           async getMSRunTableData(){
               this.msRunModalTableData=[];
               let query={
@@ -1177,14 +1110,11 @@
       // listMsRun: function(){
       //   return this.sampleData.slice(this.start, this.end)
       // },
-
     },
     mounted: function(){
       this.getSampleAttributes();
       this.getMSRunTableData();
       this.init();
-      //this.$store.commit('setUser','bbb')
-      //console.log('123',this.$Api)
     },
     computed:{
 
