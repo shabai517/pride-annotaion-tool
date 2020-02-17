@@ -23,9 +23,9 @@
                     <div class="search-button">
                         <Button type="primary" @click="back">Back</Button>
                     </div>
-                    <div class="annotation-page">
+                    <!-- <div class="annotation-page">
                       <Page :total="total" :page-size="pageSize" size="small" show-total @on-change="pageChange"></Page>
-                    </div>
+                    </div> -->
                     <div class="search-button right">
                         <Button type="primary" @click="annotationSave">Save</Button>
                         <Button type="primary" @click="annotationConfirm">Confirm</Button>
@@ -40,7 +40,7 @@
 <script>
   //import NavBar from '@/components/ebi/Nav'
   import selfTable from '@/components/table.vue'
-  var paramsFromLandingPage='';
+  //var paramsFromLandingPage='';
   export default {
     name: 'annotate',
     data(){
@@ -50,7 +50,7 @@
             keyword:'',
             loading:true,
             total:0,
-            pageSize:100
+            //pageSize:100
       }
     },
     beforeRouteUpdate:function (to, from, next) {
@@ -84,10 +84,10 @@
         else
           this.$router.push({path:'/annotation/'+this.$route.params.id+'/sample'});
       },
-      pageChange(page){
-        console.log(page)
-        this.$bus.$emit('annotation-page',{page:page,pageSize:this.pageSize});
-      },
+      // pageChange(page){
+      //   console.log(page)
+      //   this.$bus.$emit('annotation-page',{page:page,pageSize:this.pageSize});
+      // },
       annotationConfirm(){
           this.$Modal.confirm({
               title: 'Finish Annotation',
@@ -203,8 +203,8 @@
   
 </style>
 <style > 
-  .annotation-page a{
+ /* .annotation-page a{
     text-decoration:none !important;
     border-bottom-style:none !important;
-  }
+  }*/
 </style>

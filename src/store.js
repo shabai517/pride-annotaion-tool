@@ -17,6 +17,7 @@ export default new Vuex.Store({
 	},
 	mutations:{
 		setUser(state,payload){
+			Vue.$http.get('https://www.ebi.ac.uk/pride/ws/archive/v2/annotator/sampleAttributes')
 			for(let i in payload){
 				state[i] = payload[i];
 			}
