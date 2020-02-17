@@ -37,7 +37,7 @@ export default {
 			getLabel : async (query)=>{
 				try{
 					let resutls
-					let tempResutls = await	this.$http.get($store.state.baseApiURL+'/annotator/labelingValues',{params: query})
+					let tempResutls = await	$http.get($store.state.baseApiURL+'/annotator/labelingValues',{params: query})
 					//TO DO: logic
 					resutls = tempResutls
 					return resutls
@@ -49,7 +49,7 @@ export default {
 			getLabelReagent : async (query)=>{
 				try{
 					let resutls
-					let tempResutls = await	this.$http.get($store.state.baseApiURL+ '/annotator/reagentValues',{params: query})
+					let tempResutls = await	$http.get($store.state.baseApiURL+ '/annotator/reagentValues',{params: query})
 					console.log('tempResutls',tempResutls);
 					//TO DO: logic
 					resutls = tempResutls
@@ -62,7 +62,7 @@ export default {
 			getMSRunTableData: async (query)=>{
 				try{
 					let resutls
-					let tempResutls = await	this.$http.get($store.state.baseApiURL + '/msruns/byProject',{params: query})
+					let tempResutls = await	$http.get($store.state.baseApiURL + '/msruns/byProject',{params: query})
 					console.log('tempResutls',tempResutls);
 					//TO DO: logic
 					resutls = tempResutls
