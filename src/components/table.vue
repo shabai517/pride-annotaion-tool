@@ -161,6 +161,7 @@
               {
                   title: 'Name',
                   key: 'name',
+                  className:'new-col-table' //for css right border settings
               },
               {
                   title: '',
@@ -168,9 +169,9 @@
                   width:1,
                   render:(h,params)=>{
                     return h('div')
-                  }
+                  },
                   // width:0.1,
-                  // className:'new-col-table', 
+                  className:'new-col-table', 
               },
               {
                   title: '',
@@ -178,9 +179,9 @@
                   width:1,
                   render:(h,params)=>{
                     return h('div')
-                  }
+                  },
                   // width:0.1,
-                  // className:'new-col-table' 
+                  className:'new-col-table' 
               },
               {
                   title: '',
@@ -188,9 +189,9 @@
                   width:1,
                   render:(h,params)=>{
                     return h('div')
-                  }
+                  },
                   // width:0.1,
-                  // className:'new-col-table' 
+                  className:'new-col-table' 
               },
               {
                   title: '',
@@ -198,9 +199,9 @@
                   width:1,
                   render:(h,params)=>{
                     return h('div')
-                  }
+                  },
                   // width:0.1,
-                  // className:'new-col-table' 
+                  className:'new-col-table' 
               },
               {
                   title: '',
@@ -208,9 +209,9 @@
                   width:1,
                   render:(h,params)=>{
                     return h('div')
-                  }
+                  },
                   // width:0.1,
-                  // className:'new-col-table' 
+                  className:'new-col-table' 
               }
           ],
           newData:[],
@@ -1377,7 +1378,8 @@
 
 <style>
     .add-col-table .new-col-table{
-        display: none;
+        /*display: none;*/
+        border-right: none;
     }
     .add-col-table table{
         margin-bottom:0 !important;
