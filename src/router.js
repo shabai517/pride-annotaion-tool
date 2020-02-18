@@ -13,9 +13,9 @@ export default new Router({
   routes: [
     {
       path:'/',
-      name: 'login',
-      component: Login,
-
+      //name: 'login',
+      //component: Login,
+      redirect: '/annotation'
     },
     {
       path:'/annotation',
