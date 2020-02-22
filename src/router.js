@@ -1,11 +1,12 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-const Login = () => import('./views/Login.vue')
+const Index = () => import('./views/Index.vue')
 const Annotation = () => import('./views/Annotation.vue')
 const Check = () => import('./views/Check.vue')
 const Sample = () => import('./views/Sample.vue')
 const Annotate = () => import('./views/Annotate.vue')
+const CheckDataset = () => import('./views/CheckDataset.vue')
 
 Vue.use(Router)
 export default new Router({
@@ -13,9 +14,13 @@ export default new Router({
   routes: [
     {
       path:'/',
-      //name: 'login',
-      //component: Login,
-      redirect: '/annotation'
+      name: 'index',
+      component: Index,
+    },
+    {
+      path:'/checkdataset',
+      name: 'checkdataset',
+      component: CheckDataset,
     },
     {
       path:'/annotation',
