@@ -16,7 +16,7 @@
             <Card>
                   <p slot="title">SDRF Reader</p>
                   <div class="table-container">
-                      <Table border ref="selection" :loading="fileListLoading" :columns="fileListCol" :data="fileList" ></Table>
+                      <Table stripe border ref="selection" :loading="fileListLoading" :columns="fileListCol" :data="fileList" ></Table>
                   </div>
                 </Card>
           </Row>
@@ -33,7 +33,8 @@
            fileListCol:[
            ],
            fileList:[],
-           keyList:[]
+           keyList:[],
+          
       }
     },
     beforeRouteUpdate:function (to, from, next) {
@@ -66,7 +67,7 @@
                       let item = {
                         title:header[j],
                         key:header[j].replace(/\s+/g,""),
-                        //maxWidth:700
+                        className:that.setClassName(header[j].replace(/\s+/g,"")),
                         width:300
                       }
                       that.keyList.push(item.key)
@@ -83,7 +84,6 @@
               }
             }
             that.fileListLoading=false
-            console.log(that.fileListCol,that.fileList)
             // for(let i in header)
             // console.log(header)
             //document.getElementById("result").innerHTML += urlData;
@@ -94,6 +94,15 @@
           //   console.log(e)
           // }, false);
       },
+      setClassName(name){
+        if(name.match('sourcename') || name.match('characteristics'))
+          return 'blue'
+        else if(name.match('assayname') || name.match('comment'))
+          return 'green'
+        else
+          return 'red'
+      },
+     
     },
     watch: {
 
@@ -102,7 +111,7 @@
   
     },
     mounted: function(){
-        //this.readFile();
+        this.getTableHeight();
      
     },
     created(){
@@ -152,6 +161,7 @@
       color: white;
       text-decoration: none;
   }
+
 </style>
 <style > 
 .table-container .ivu-table-header table{
@@ -159,5 +169,17 @@
 }
 .table-container .ivu-table-body table{
   width: 100% !important;
+}
+th.blue{
+    background-color: #84bafd !important;
+    color: white !important;
+}
+th.green{
+    background-color: #96d810 !important;
+    color: white !important;
+}
+th.red{ 
+    background-color: #ea7e7c !important;
+    color: white !important;
 }
 </style>
