@@ -16,7 +16,7 @@
             <Card>
                   <p slot="title">SDRF Reader</p>
                   <div class="table-container">
-                      <Table stripe border ref="selection" :height='tableHeight' :loading="fileListLoading" :columns="fileListCol" :data="fileList" ></Table>
+                      <Table stripe border ref="selection" :height='tableHeight'  :loading="fileListLoading" :columns="fileListCol" :data="fileList" ></Table>
                   </div>
                 </Card>
           </Row>
@@ -34,7 +34,7 @@
            ],
            fileList:[],
            keyList:[],
-           tableHeight:100
+           screenHeight: document.documentElement.clientHeight
       }
     },
     beforeRouteUpdate:function (to, from, next) {
@@ -102,19 +102,21 @@
         else
           return 'red'
       },
-      getTableHeight(){
-        this.tableHeight = document.documentElement.clientHeight - 90*2 - 138 - 20 - 55 - 16*2
-      }
     },
     watch: {
 
     },
     computed:{
-  
+      tableHeight:function(){
+        let minHeight = 400
+        return this.screenHeight - 90*2 - 138 - 20 - 55 - 16*2 > minHeight ? this.screenHeight - 90*2 - 138 - 20 - 55 - 16*2 : minHeight
+      }
     },
     mounted: function(){
-        this.getTableHeight();
-     
+        var that = this
+        window.onresize = function () { 
+          that.screenHeight = document.documentElement.clientHeight
+        }
     },
     created(){
       
