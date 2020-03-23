@@ -16,7 +16,7 @@
             <Card>
                   <p slot="title">SDRF Reader</p>
                   <div class="table-container">
-                      <Table stripe border ref="selection" :loading="fileListLoading" :columns="fileListCol" :data="fileList" ></Table>
+                      <Table stripe border ref="selection" :height='tableHeight' :loading="fileListLoading" :columns="fileListCol" :data="fileList" ></Table>
                   </div>
                 </Card>
           </Row>
@@ -34,7 +34,7 @@
            ],
            fileList:[],
            keyList:[],
-          
+           tableHeight:100
       }
     },
     beforeRouteUpdate:function (to, from, next) {
@@ -102,7 +102,9 @@
         else
           return 'red'
       },
-     
+      getTableHeight(){
+        this.tableHeight = document.documentElement.clientHeight - 90*2 - 138 - 20 - 55 - 16*2
+      }
     },
     watch: {
 
