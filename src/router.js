@@ -7,6 +7,7 @@ const Check = () => import('./views/Check.vue')
 const Sample = () => import('./views/Sample.vue')
 const Annotate = () => import('./views/Annotate.vue')
 const CheckDataset = () => import('./views/CheckDataset.vue')
+const Srdf = () => import('./views/Srdf.vue')
 
 Vue.use(Router)
 export default new Router({
@@ -41,6 +42,11 @@ export default new Router({
       path:'/annotation/:id/annotate',
       name: 'annotate',
       component: Annotate,
+    },
+    {
+      path:'/srdf',
+      name: 'srdf',
+      component: Srdf,
     },
   ],
 })

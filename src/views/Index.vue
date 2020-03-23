@@ -4,6 +4,7 @@
         <div class="action">
             <Button type="primary" @click="gotoPublicDataset">Public Dataset</Button>
             <Button type="primary" @click="gotoNewDataset">New Dataset</Button>
+            <Button type="primary" @click="gotosSRDF">Load SRDF</Button>
         </div>
         <div class="content">
             XXXXXXX
@@ -26,6 +27,9 @@
             gotoNewDataset(){
                 this.$router.push({ name: 'annotation'});
             },
+            gotosSRDF(){
+                this.$router.push({ name: 'srdf'});
+            }
         },
         mounted:function(){
             
@@ -62,6 +66,7 @@
       justify-content: center;
       flex-direction: row;
       font-size: 20px;
+      margin: 0 20px;
     }
 </style>
 <style>
