@@ -3,7 +3,7 @@
       <div class="browse-data-container">
           <Row>
               <div class="title">
-                  Welcome to Pride Annotation System
+                  SDRF Annotation Tool
               </div>
               <div class="step-wrapper">
                   <Steps :current="annotationStep">

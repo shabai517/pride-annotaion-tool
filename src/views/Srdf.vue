@@ -3,7 +3,7 @@
       <div class="browse-data-container">
           <Row style="margin-bottom: 20px">
               <div class="title">
-                  Welcome to Pride Annotation System
+                 Omics Sample to Data Annotation Tool
               </div>
               <div class="upload">
                 <a href="javascript:;" class="file">
@@ -14,7 +14,7 @@
           </Row>
           <Row>
             <Card>
-                  <p slot="title">SDRF Reader</p>
+                  <p slot="title">Omics SDRF Reader</p>
                   <div class="table-container">
                       <Table stripe border ref="selection" :height='tableHeight'  :loading="fileListLoading" :columns="fileListCol" :data="fileList" ></Table>
                   </div>
@@ -38,10 +38,10 @@
       }
     },
     beforeRouteUpdate:function (to, from, next) {
-     
+
     },
     components: {
-      
+
     },
     methods:{
       readFile(e){
@@ -77,7 +77,7 @@
               else{
                 let body = arr[i].split('\t');
                 let item = {}
-                for(let j in body){ 
+                for(let j in body){
                     item[that.keyList[j]]=body[j]
                 }
                 that.fileList.push(item)
@@ -88,7 +88,7 @@
             // console.log(header)
             //document.getElementById("result").innerHTML += urlData;
         };
-       
+
           // var inputElement = document.getElementById("file");
           // inputElement.addEventListener("change", (e)=>{
           //   console.log(e)
@@ -114,21 +114,21 @@
     },
     mounted: function(){
         var that = this
-        window.onresize = function () { 
+        window.onresize = function () {
           that.screenHeight = document.documentElement.clientHeight
         }
     },
     created(){
-      
+
     },
     beforeDestroy(){
-          
+
     },
-   
+
   }
 </script>
 
-<style scoped>  
+<style scoped>
   .browse-data-container{
     width: 80%;
     margin:0 auto;
@@ -167,7 +167,7 @@
   }
 
 </style>
-<style > 
+<style >
 .table-container .ivu-table-header table{
   width: 100% !important;
 }
@@ -182,7 +182,7 @@ th.green{
     background-color: #96d810 !important;
     color: white !important;
 }
-th.red{ 
+th.red{
     background-color: #ea7e7c !important;
     color: white !important;
 }

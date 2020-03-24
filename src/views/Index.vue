@@ -1,13 +1,13 @@
 <template>
     <div class="index-container">
-        <div class="title">Annotation Tool</div>
+        <div class="title">Omics Sample to Data Annotation Tool</div>
         <div class="action">
             <Button type="primary" @click="gotoPublicDataset">Public Dataset</Button>
             <Button type="primary" @click="gotoNewDataset">New Dataset</Button>
             <Button type="primary" @click="gotosSRDF">Load SRDF</Button>
         </div>
         <div class="content">
-            XXXXXXX
+            Read more about the SDRF file format <a href="https://github.com/bigbio/proteomics-metadata-standard/">here</a>
         </div>
     </div>
 </template>
@@ -15,7 +15,7 @@
     export default {
         data () {
             return {
-    
+
             }
         },
         components: {
@@ -32,7 +32,7 @@
             }
         },
         mounted:function(){
-            
+
         },
     }
 </script>
