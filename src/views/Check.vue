@@ -1,242 +1,256 @@
 <template>
-  <div class="check-container">
-      <div class="browse-data-container">
-          <Row>
-              <div class="title">
-                  SDRF Annotation Tool
-              </div>
-              <div class="step-wrapper">
-                  <Steps :current="annotationStep">
-                      <Step title="Search" content="Find your project to annotate"></Step>
-                      <Step title="Check" content="Confirm your project information"></Step>
-                      <Step title="Sample" content="Give the number of samples"></Step>
-                      <Step title="Annotate" content="Add the raw file"></Step>
-                  </Steps>
-              </div>
-          </Row>
-          <div v-if="annotationStep == 1" class="stepTwo">
-              <!--<Spin size="large" fix v-if="loading"></Spin>-->
-              <Row>
-                <Card>
-                    <p slot="title" class="resource-list-title-container">
-                      <span>Project {{accession}}</span>
-                      <Icon v-if="editProjectBool" type="android-done" @click="saveProject" size="25" color="#2d8cf0"></Icon>
-                      <Icon v-else type="edit" @click="editProject" size="20" ></Icon>
-                    </p>
-                    <div class="card-content">
-                          <div class="card-item-wrapper">
-                              <div class="summary-content-header">Title</div>
-                              <p v-if="editProjectBool"><Input v-model="title" type="textarea" :autosize="true" placeholder="Enter something..."></Input></p>
-                              <p v-else>{{title}}</p>
-                          </div>
-                          <div class="card-item-wrapper">
-                              <div class="summary-content-header">Description</div>
-                              <p v-if="editProjectBool"><Input v-model="projectDescription" type="textarea" :autosize="true" placeholder="Enter something..."></Input></p>
-                              <read-more v-else class="readMore" more-str="Read more" :text="projectDescription" link="#" less-str="Read less" :max-chars="400"></read-more>
-                          </div>
-                          <div class="card-item-wrapper">
-                              <div class="summary-content-header">Sample Processing Protocol</div>
-                              <div v-if="sampleProcessingProtocol != 'Not available'">
-                                <p v-if="editProjectBool"><Input v-model="sampleProcessingProtocol" type="textarea" :autosize="true" placeholder="Enter something..."></Input></p>
-                                <read-more v-else class="readMore" more-str="Read more" :text="sampleProcessingProtocol" link="#" less-str="Read less" :max-chars="400"></read-more>
+  <div class="check-dataset-container">
+      <div class="title">
+          Welcome to Pride Annotation System
+      </div>
+      <Step :step="annotationStep" :des="stepDes"></Step>
+      <Card class="card">
+        <p slot="title">Search</p>
+        <div class="search-container">
+          <div>
+            <span class="name">Accession</span><Input v-model="keyword" size="small" style="width: 150px; margin-right: 10px"></Input> 
+            <Icon type="md-arrow-round-forward" style="margin-right: 10px"/>
+            <span class="name">Database</span>
+            <Select v-model="database" size="small" style="width:150px">
+                <Option v-for="item in databaseArray" :value="item.value" :key="item.value">{{ item.label }}</Option>
+            </Select>
+          </div>
+          <Button type="primary" size="small" @click="search">Search</Button>
+        </div>
+      </Card>
+      <div v-if="!accession" style="margin-top: 20px">
+          <Card class="card">
+             <p slot="title"></i>Project</p>
+             <div style="display: flex;text-align: center;align-items: center; height: 300px;justify-content: center;">
+                No Data
+             </div>
+          </Card>
+      </div>
+      <div v-else>
+        <Row :gutter="16">
+          <Col span="16">
+              <Card class="card info">
+                  <p slot="title" class="resource-list-title-container">
+                    <span>Project {{accession}}</span>
+                    <Icon v-if="editProjectBool" type="android-done" @click="saveProject" size="25" color="#2d8cf0"></Icon>
+                    <Icon v-else type="edit" @click="editProject" size="20" ></Icon>
+                  </p>
+                  <div class="card-content">
+                        <div class="card-item-wrapper">
+                            <div class="summary-content-header">Title</div>
+                            <p v-if="editProjectBool"><Input v-model="title" type="textarea" :autosize="true" placeholder="Enter something..."></Input></p>
+                            <p v-else>{{title}}</p>
+                        </div>
+                        <div class="card-item-wrapper">
+                            <div class="summary-content-header">Description</div>
+                            <p v-if="editProjectBool"><Input v-model="projectDescription" type="textarea" :autosize="true" placeholder="Enter something..."></Input></p>
+                            <read-more v-else class="readMore" more-str="Read more" :text="projectDescription" link="#" less-str="Read less" :max-chars="200"></read-more>
+                        </div>
+                        <div class="card-item-wrapper">
+                            <div class="summary-content-header">Sample Processing Protocol</div>
+                            <div v-if="sampleProcessingProtocol != 'Not available'">
+                              <p v-if="editProjectBool"><Input v-model="sampleProcessingProtocol" type="textarea" :autosize="true" placeholder="Enter something..."></Input></p>
+                              <read-more v-else class="readMore" more-str="Read more" :text="sampleProcessingProtocol" link="#" less-str="Read less" :max-chars="200"></read-more>
+                            </div>
+                            <div v-else>
+                                <div v-if="publications.length == 0">
+                                  <p>Not available</p>
+                                </div>
+                                <div v-else>
+                                  <div v-for="item in publications">
+                                    <p>See details in reference(s): <a @click="europePMC(item.pmid)">{{item.pmid}}</a></p>
+                                  </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-item-wrapper">
+                            <div class="summary-content-header">Data Processing Protocol</div>
+                            <div v-if="dataProcessingProtocol != 'Not available'">
+                              <p v-if="editProjectBool"><Input v-model="sampleProcessingProtocol" type="textarea" :autosize="true" placeholder="Enter something..."></Input></p>
+                              <read-more v-else class="readMore" more-str="Read more" :text="dataProcessingProtocol" link="#" less-str="Read less" :max-chars="200"></read-more>
+                            </div>
+                            <div v-else>
+                                <div v-if="publications.length == 0">
+                                  <p>Not available</p>
+                                </div>
+                                <div v-else>
+                                  <div v-for="item in publications">
+                                    <p>See details in reference(s): <a @click="europePMC(item.pmid)">{{item.pmid}}</a></p>
+                                  </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-item-wrapper">
+                            <div class="summary-content-header">Contact</div>
+                            <p v-for ="item in contactors"> <a :href="'mailto:'+item.email">{{item.name}}</a><span>, {{item.affiliation}}</span></p>
+                        </div>
+                        <div class="card-item-wrapper">
+                            <div class="summary-content-header">Submission Date</div>
+                            <p>{{submissionDate}}</p>
+                        </div>
+                        <div class="card-item-wrapper">
+                            <div class="summary-content-header">Publication Date</div>
+                            <p>{{publicationDate}}</p>
+                        </div>
+                  </div>
+              </Card>
+          </Col>
+          <Col span="8"> 
+              <Card class="card info">
+                   <p slot="title">Properties</p>
+                   <div class="property">
+                        <div class="property-row">
+                            <div class="summary-content-header">Organism</div>
+                            <div class="property-wrapper">
+                              <div v-if="species.length>0">
+                                <div v-for="item in species">
+                                  <a>{{item.name}}</a>
+                                </div>
                               </div>
                               <div v-else>
-                                  <div v-if="publications.length == 0">
-                                    <p>Not available</p>
-                                  </div>
-                                  <div v-else>
-                                    <div v-for="item in publications">
-                                      <p>See details in reference(s): <a @click="europePMC(item.pmid)">{{item.pmid}}</a></p>
-                                    </div>
-                                  </div>
+                                  <p>Unknown</p>
                               </div>
-                          </div>
-                          <div class="card-item-wrapper">
-                              <div class="summary-content-header">Data Processing Protocol</div>
-                              <div v-if="dataProcessingProtocol != 'Not available'">
-                                <p v-if="editProjectBool"><Input v-model="sampleProcessingProtocol" type="textarea" :autosize="true" placeholder="Enter something..."></Input></p>
-                                <read-more v-else class="readMore" more-str="Read more" :text="dataProcessingProtocol" link="#" less-str="Read less" :max-chars="400"></read-more>
+                            </div>
+                        </div>
+                        <div class="property-row">
+                            <div class="summary-content-header">Organism part</div>
+                            <div class="property-wrapper">
+                              <div v-if="tissues.length>0">
+                                <div v-for="item in tissues">
+                                  <a>{{item.name}}</a>
+                                </div>
                               </div>
                               <div v-else>
-                                  <div v-if="publications.length == 0">
-                                    <p>Not available</p>
-                                  </div>
-                                  <div v-else>
-                                    <div v-for="item in publications">
-                                      <p>See details in reference(s): <a @click="europePMC(item.pmid)">{{item.pmid}}</a></p>
-                                    </div>
-                                  </div>
+                                  <p>Unknown</p>
                               </div>
-                          </div>
-                          <div class="card-item-wrapper">
-                              <div class="summary-content-header">Contact</div>
-                              <p v-for ="item in contactors"> <a :href="'mailto:'+item.email">{{item.name}}</a><span>, {{item.affiliation}}</span></p>
-                          </div>
-                          <div class="card-item-wrapper">
-                              <div class="summary-content-header">Submission Date</div>
-                              <p>{{submissionDate}}</p>
-                          </div>
-                          <div class="card-item-wrapper">
-                              <div class="summary-content-header">Publication Date</div>
-                              <p>{{publicationDate}}</p>
-                          </div>
-                    </div>
-                </Card>
-                <Card class="card">
-                     <p slot="title">Properties</p>
-                     <div class="property">
-                          <div class="property-row">
-                              <div class="summary-content-header">Organism</div>
-                              <div class="property-wrapper">
-                                <div v-if="species.length>0">
-                                  <div v-for="item in species">
-                                    <a>{{item.name}}</a>
-                                  </div>
-                                </div>
-                                <div v-else>
-                                    <p>Unknown</p>
+                            </div>
+                        </div>
+                        <div class="property-row">
+                            <div class="summary-content-header">Diseases</div>
+                            <div class="property-wrapper">
+                              <div v-if="diseases.length>0">
+                                <div v-for="item in diseases">
+                                  <a>{{item.name}}</a>
                                 </div>
                               </div>
-                          </div>
-                          <div class="property-row">
-                              <div class="summary-content-header">Organism part</div>
-                              <div class="property-wrapper">
-                                <div v-if="tissues.length>0">
-                                  <div v-for="item in tissues">
-                                    <a>{{item.name}}</a>
-                                  </div>
-                                </div>
-                                <div v-else>
-                                    <p>Unknown</p>
+                              <div v-else>
+                                  <p>Unknown</p>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="property-row">
+                            <div class="summary-content-header">Modification</div>
+                            <div class="property-wrapper">
+                              <div v-if="modification.length>0">
+                                <div v-for="item in modification">
+                                  <a>{{item.name}}</a>
                                 </div>
                               </div>
-                          </div>
-                          <div class="property-row">
-                              <div class="summary-content-header">Diseases</div>
-                              <div class="property-wrapper">
-                                <div v-if="diseases.length>0">
-                                  <div v-for="item in diseases">
-                                    <a>{{item.name}}</a>
-                                  </div>
-                                </div>
-                                <div v-else>
-                                    <p>Unknown</p>
+                              <div v-else>
+                                  <p>No PTMs are included in the dataset</p>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="property-row">
+                            <div class="summary-content-header">Instrument</div>
+                            <div class="property-wrapper">
+                              <div v-if="instrumentNames.length>0">
+                                <div v-for="item in instrumentNames">
+                                  <a>{{item.name}}</a>
                                 </div>
                               </div>
-                          </div>
-                          <div class="property-row">
-                              <div class="summary-content-header">Modification</div>
-                              <div class="property-wrapper">
-                                <div v-if="modification.length>0">
-                                  <div v-for="item in modification">
-                                    <a>{{item.name}}</a>
-                                  </div>
-                                </div>
-                                <div v-else>
-                                    <p>No PTMs are included in the dataset</p>
+                              <div v-else>
+                                  <p>Unknown</p>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="property-row">
+                            <div class="summary-content-header">Software</div>
+                            <div class="property-wrapper">
+                              <div v-if="softwares.length>0">
+                                <div v-for="item in softwares">
+                                  <a>{{item.name}}</a>
                                 </div>
                               </div>
-                          </div>
-                          <div class="property-row">
-                              <div class="summary-content-header">Instrument</div>
-                              <div class="property-wrapper">
-                                <div v-if="instrumentNames.length>0">
-                                  <div v-for="item in instrumentNames">
-                                    <a>{{item.name}}</a>
-                                  </div>
-                                </div>
-                                <div v-else>
-                                    <p>Unknown</p>
-                                </div>
+                              <div v-else>
+                                  <p>Unknown</p>
                               </div>
-                          </div>
-                          <div class="property-row">
-                              <div class="summary-content-header">Software</div>
-                              <div class="property-wrapper">
-                                <div v-if="softwares.length>0">
-                                  <div v-for="item in softwares">
-                                    <a>{{item.name}}</a>
-                                  </div>
-                                </div>
-                                <div v-else>
-                                    <p>Unknown</p>
-                                </div>
 
-                              </div>
-                          </div>
-                          <div class="property-row">
-                              <div class="summary-content-header">Experiment Type</div>
-                              <div class="property-wrapper">
-                                <div v-if="experimentTypes.length>0">
-                                  <div v-for="item in experimentTypes">
-                                    <a>{{item}}</a>
-                                  </div>
-                                </div>
-                                <div v-else>
-                                    <p>Unknown</p>
+                            </div>
+                        </div>
+                        <div class="property-row">
+                            <div class="summary-content-header">Experiment Type</div>
+                            <div class="property-wrapper">
+                              <div v-if="experimentTypes.length>0">
+                                <div v-for="item in experimentTypes">
+                                  <a>{{item}}</a>
                                 </div>
                               </div>
-                          </div>
-                          <div class="property-row">
-                              <div class="summary-content-header">Quantification</div>
-                              <div class="property-wrapper">
-                                <div v-if="quantificationMethods.length>0">
-                                  <div v-for="item in quantificationMethods">
-                                    <a>{{item.name}}</a>
-                                  </div>
-                                </div>
-                                <div v-else>
-                                    <p>Unknown</p>
+                              <div v-else>
+                                  <p>Unknown</p>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="property-row">
+                            <div class="summary-content-header">Quantification</div>
+                            <div class="property-wrapper">
+                              <div v-if="quantificationMethods.length>0">
+                                <div v-for="item in quantificationMethods">
+                                  <a>{{item.name}}</a>
                                 </div>
                               </div>
-                          </div>
-                     </div>
-                </Card>
-                <Card class="card">
-                   <p slot="title"></i>MsRun Files</p>
-                   <!--
-                   <div class="filter-wrapper">
-                       <div class="summary-content-header">Filter</div>
-                       <Select v-model="model1" size="small" style="width:100px">
-                          <Option v-for="item in cityList" :value="item.value" :key="item.value">{{ item.label }}</Option>
-                       </Select>
+                              <div v-else>
+                                  <p>Unknown</p>
+                              </div>
+                            </div>
+                        </div>
                    </div>
-                    -->
-                   <div class="download-list-wrapper">
-                     <!--<div class="summary-content-header">List</div>-->
-                     <div class="download-list">
-                       <Table border ref="selection" height="350" :loading="fileListLoading" :columns="fileListCol" :data="fileList" @on-select="downLoadSelect" @on-select-all="filesSelectAll"></Table>
-                       <!--
-                       <div class="page-container">
-                          <Page :total="totalDownLoad" :page-size="pageSizeDownLoad" size="small" class-name="page" @on-change="pageChangeDownload" @on-page-size-change="pageSizeChangeDownload"></Page>
-                       </div>
-                       -->
-                       <!--<Button v-if="selectAllfiles" class= "download-button">Download</Button>-->
-                     </div>
-                   </div>
-                </Card>
-                <div class="button-wrapper">
-                    <div class="search-button">
-                        <Button type="primary" @click="back">Back</Button>
-                    </div>
-                    <div class="search-button">
-                        <Button type="primary" @click="next">Next</Button>
-                    </div>
-                </div>
-              </Row>
+              </Card>
+          </Col>
+        </Row>         
+        <Card class="card">
+           <p slot="title"></i>MsRun Files</p>
+           <div class="download-list-wrapper">
+             <div class="download-list">
+               <Table border ref="selection" height="450" :loading="fileListLoading" :columns="fileListCol" :data="fileList" @on-select="downLoadSelect" @on-select-all="filesSelectAll"></Table>
+             </div>
+           </div>
+        </Card>
+      </div>
+      <div class="button-wrapper">
+          <div class="search-button">
+              <Button type="primary" @click="back">Back</Button>
+          </div>
+          <div class="search-button">
+              <Button type="primary" @click="next">Next</Button>
           </div>
       </div>
   </div>
 </template>
 
 <script>
-  //import NavBar from '@/components/ebi/Nav'
-  import store from "@/store.js"
+  import Step from "@/components/step.vue"
   export default {
     name: 'check',
     data(){
       return {
-            annotationStep:1,
+            keyword:'',
+            loading:true,
+            queryArchiveProjectApi: this.$store.state.baseApiURL + '/projects/',
+            queryArchiveProjectFilesApi: this.$store.state.baseApiURL + '/projects/',
+            annotationStep:0,
+            stepDes:'Here is used to put the explanation about steps',
+            database:'pride',
+            databaseArray:[
+              {
+                label:'Pride',
+                value:'pride'
+              },
+              {
+                label:'xxxxx',
+                value:'xxxxx'
+              }
+            ],
             accession:'',
             title:'',
             projectDescription:'',
@@ -254,7 +268,6 @@
             sampleProcessingProtocol:'',
             dataProcessingProtocol:'',
             contactors:[],
-            loading:true,
             fileListLoading:false,
             fileListCol: [
               /*
@@ -316,7 +329,6 @@
                                     }
                                 }
                             }, params.row.type),
-
                             /*
                             h('Button', {
                                 props: {
@@ -338,7 +350,6 @@
                                     }
                                 }
                             }, 'FTP'),*/
-
                         ]);
                     }
                 },
@@ -410,169 +421,147 @@
             fileList: [],
             pageDownLoad:0,
             pageSizeDownLoad:100,
-            queryArchiveProjectApi: this.$store.state.baseApiURL + '/projects/',
-            queryArchiveProjectFilesApi: this.$store.state.baseApiURL + '/projects/',
       }
     },
     beforeRouteUpdate:function (to, from, next) {
-      //console.log('to.params',to.params);
-      //console.log('beforeRouteUpdate',to.query);
+     
       next();
     },
     components: {
-      //NavBar,
+      Step
     },
     methods:{
-      showDataset(id){
-           this.loading=true;
-           this.$http
-            .get(this.queryArchiveProjectApi + id)
-            .then(function(res){
-                this.loading = false;
-                this.accession = res.body.accession;
-                //for self table
-                this.projectAccession=res.body.accession;
-                this.title = res.body.title;
-                this.projectDescription = res.body.projectDescription;
-                this.publicationDate = res.body.publicationDate.split('-')[2] +'/'+ res.body.publicationDate.split('-')[1] +'/'+ res.body.publicationDate.split('-')[0];
-                this.submissionDate = res.body.submissionDate.split('-')[2] +'/'+ res.body.submissionDate.split('-')[1] +'/'+ res.body.submissionDate.split('-')[0];
-                
-                this.sampleProcessingProtocol = res.body.sampleProcessingProtocol;
-                this.dataProcessingProtocol = res.body.dataProcessingProtocol;
+        showDataset(id){
+             this.$Spin.show();
+             this.$http
+              .get(this.queryArchiveProjectApi + id)
+              .then(function(res){
+                  this.$Spin.hide();
+                  this.accession = res.body.accession;
+                  //for self table
+                  this.projectAccession=res.body.accession;
+                  this.title = res.body.title;
+                  this.projectDescription = res.body.projectDescription;
+                  this.publicationDate = res.body.publicationDate.split('-')[2] +'/'+ res.body.publicationDate.split('-')[1] +'/'+ res.body.publicationDate.split('-')[0];
+                  this.submissionDate = res.body.submissionDate.split('-')[2] +'/'+ res.body.submissionDate.split('-')[1] +'/'+ res.body.submissionDate.split('-')[0];
+                  
+                  this.sampleProcessingProtocol = res.body.sampleProcessingProtocol;
+                  this.dataProcessingProtocol = res.body.dataProcessingProtocol;
 
-                //for contactors
-                for(let i=0; i<res.body.submitters.length; i++){
-                  let item = {
-                    name: res.body.submitters[i].name,
-                    affiliation: res.body.submitters[i].affiliation,
-                    email:res.body.submitters[i].email
+                  //for contactors
+                  for(let i=0; i<res.body.submitters.length; i++){
+                    let item = {
+                      name: res.body.submitters[i].name,
+                      affiliation: res.body.submitters[i].affiliation,
+                      email:res.body.submitters[i].email
+                    }
+                    this.contactors.push(item);
                   }
-                  this.contactors.push(item);
-                }
-                for(let i=0; i<res.body.labPIs.length; i++){
-                  let item = {
-                    name: res.body.labPIs[i].name,
-                    affiliation: res.body.labPIs[i].affiliation + ' ' +'(lab head)',
-                    email:res.body.labPIs[i].email
+                  for(let i=0; i<res.body.labPIs.length; i++){
+                    let item = {
+                      name: res.body.labPIs[i].name,
+                      affiliation: res.body.labPIs[i].affiliation + ' ' +'(lab head)',
+                      email:res.body.labPIs[i].email
+                    }
+                    this.contactors.push(item);
                   }
-                  this.contactors.push(item);
-                }
-                
-                this.species = res.body.organisms || [];
-                this.tissues = res.body.organismParts || [];
-                this.diseases = res.body.diseases || [];
-                this.instrumentNames = res.body.instruments || [];
-                this.softwares = res.body.softwares || [];
-                this.quantificationMethods = res.body.quantificationMethods || [];
-                this.experimentTypes = res.body.projectTags || [];
-                this.modification = res.body.identifiedPTMStrings || [];
+                  
+                  this.species = res.body.organisms || [];
+                  this.tissues = res.body.organismParts || [];
+                  this.diseases = res.body.diseases || [];
+                  this.instrumentNames = res.body.instruments || [];
+                  this.softwares = res.body.softwares || [];
+                  this.quantificationMethods = res.body.quantificationMethods || [];
+                  this.experimentTypes = res.body.projectTags || [];
+                  this.modification = res.body.identifiedPTMStrings || [];
 
-                //for id checking
-                localStorage.setItem('tempProjectAccession',this.$route.params.id);
-                console.log('tempProjectAccession',localStorage.getItem('tempProjectAccession'));
-                /*
-                //for publications
-                //console.log('res.body',res.body);
-                for(let i=0; i<res.body.references.length; i++){
-                  let item = {
-                    desc:res.body.references[i].referenceLine,
-                    pmid:res.body.references[i].pubmedId,
-                  }
-                  this.publications.push(item);
-                }*/
+                  //for id checking
+                  localStorage.setItem('tempProjectAccession',this.accession);
 
-            },function(err){
-                  this.$Message.error({content:'Project Query Error', duration:1});
-                  this.back();
-            });
-      },
-      queryArchiveProjectFiles(id){
-           var id = id || this.$route.params.id;
-           this.fileListLoading = true;
-           this.$http
-            .get(this.queryArchiveProjectFilesApi +id+ '/files'+ this.queryDownload)
-            .then(function(res){
-                console.log(res.body);
-                this.fileListLoading = false;
-                this.totalDownLoad = res.body.page.totalElements;
-                if(res.body._embedded && res.body._embedded.files){
-                  let filesArray = res.body._embedded.files;
-                  let tempArray = [];
-                  for(let i=0;i<filesArray.length;i++){
-                      let item ={
-                            name: filesArray[i].fileName,
-                            type: filesArray[i].fileCategory.value,
-                            size: Math.round(filesArray[i].fileSizeBytes/1024/1024),
-                            url: {
-                              ftp: filesArray[i].publicFileLocations[0].value,
-                              asp: filesArray[i].publicFileLocations[1].value
-                            }
-                      }
-                      tempArray.push(item);
-                  }
-
-                  this.fileList=tempArray;
-                }
-                else{
-                    this.$Message.error({content:'No results', duration:1});
-                }
-            },function(err){
-                this.fileListLoading = false;
-            });
-      },
-      downLoadSelect(selection,row){
-          console.log(selection);
-          console.log(row);
-      },
-      filesSelectAll(){
-          this.selectAllfiles =! this.selectAllfiles;
-          this.$refs.selection.selectAll(this.selectAllfiles);
-      },
-      back(){
-        this.$router.push({path:'/annotation'});
-      },
-      next(){
-        this.$router.push({path:'/annotation/'+this.$route.params.id+'/sample'});
-      },
-      editProject(){
-        this.editProjectBool=true;
-      },
-      saveProject(){
-        this.editProjectBool=false;
-      },
-      localStorageCheck(){
-          var projectAccession = localStorage.getItem("projectAccession");
-          console.log('projectAccession',projectAccession);
-          if(projectAccession)
-              this.$Modal.confirm({
-                  title: 'Uncompleted Annotaion',
-                  content: '<p>Do you want to carry on with the previouse annotation?</p>',
-                  onOk: () => {
-                      this.$router.push({path:'/annotation/'+projectAccession+'/annotate'});
-                  },
-                  onCancel: () => {
-                      console.log('ok');
-                      localStorage.clear();
-                  }
+                  this.queryArchiveProjectFiles(this.keyword);
+              },function(err){
+                    this.accession = '' //for UI
+                    this.$Spin.hide();
+                    this.$Message.error({content:'Project Query Error', duration:1});
               });
-      },
+        },
+        queryArchiveProjectFiles(id){
+             var id = id || this.$route.params.id;
+             this.fileListLoading = true;
+             this.$http
+              .get(this.queryArchiveProjectFilesApi +id+ '/files'+ this.queryDownload)
+              .then(function(res){
+                  this.fileListLoading = false;
+                  this.totalDownLoad = res.body.page.totalElements;
+                  if(res.body._embedded && res.body._embedded.files){
+                    let filesArray = res.body._embedded.files;
+                    let tempArray = [];
+                    for(let i=0;i<filesArray.length;i++){
+                        let item ={
+                              name: filesArray[i].fileName,
+                              type: filesArray[i].fileCategory.value,
+                              size: Math.round(filesArray[i].fileSizeBytes/1024/1024),
+                              url: {
+                                ftp: filesArray[i].publicFileLocations[0].value,
+                                asp: filesArray[i].publicFileLocations[1].value
+                              }
+                        }
+                        tempArray.push(item);
+                    }
+                    this.fileList=tempArray;
+                  }
+                  else{
+                      this.$Message.error({content:'No Files', duration:1});
+                  }
+              },function(err){
+                  this.fileListLoading = false;
+              });
+        },
+        search(){
+            this.showDataset(this.keyword)
+        },
+        editProject(){
+          this.editProjectBool=true;
+        },
+        saveProject(){
+          this.editProjectBool=false;
+        },
+        downLoadSelect(selection,row){
+            console.log(selection);
+            console.log(row);
+        },
+        filesSelectAll(){
+            this.selectAllfiles =! this.selectAllfiles;
+            this.$refs.selection.selectAll(this.selectAllfiles);
+        },
+        back(){
+          this.$router.push({ name: 'index'});
+        },
+        next(){
+          if(this.accession)
+            this.$router.push({path:'/sample/'+this.accession})
+          else
+            this.$Message.error({content:'No Project', duration:1});
+        }
     },
-    computed:{//TODO for queryAssayApi
-      query:function(){
-          let page='page='+this.page+'&';
-          let size='size='+this.size;
-          return '?'+sequence+project+mod+page+size;
-      },
-      queryDownload:function(){
-          let pageDownLoad='page='+this.pageDownLoad+'&';
-          let pageSizeDownLoad='pageSize='+this.pageSizeDownLoad;
-          return '?'+pageDownLoad+pageSizeDownLoad;
-      }
+
+    watch: {
+     
+    },
+    computed:{
+        query:function(){
+            let page='page='+this.page+'&';
+            let size='size='+this.size;
+            return '?'+sequence+project+mod+page+size;
+        },
+        queryDownload:function(){
+            let pageDownLoad='page='+this.pageDownLoad+'&';
+            let pageSizeDownLoad='pageSize='+this.pageSizeDownLoad;
+            return '?'+pageDownLoad+pageSizeDownLoad;
+        }
     },
     mounted: function(){
-      this.localStorageCheck();
-      this.queryArchiveProjectFiles();
-      this.showDataset(this.$route.params.id);
+     
     },
     created(){
       
@@ -580,28 +569,21 @@
     beforeDestroy(){
           
     },
-    beforeRouteEnter(to,from,next){
-        next(vm=>{
-          // let username = localStorage.getItem('username') || '';
-          // if(!username){
-          //   vm.$Message.error({content:'Please Login', duration:2})
-          //   vm.$router.push({name:'annotation'})
-          // }
-        });
-    }
   }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>  
-  .check-container{
-    width: 100%;
+  .check-dataset-container{
+    width: 80%;
+    margin:0 auto;
+    padding: 90px 0;
   }
-  .check-container a{
+  .check-dataset-container a{
     color:#2c3e50 !important;
     border-bottom: 1px black dotted;
   }
-  .check-container a:hover{
+  .check-dataset-container a:hover{
     color:#2d8cf0;
   }
   .title{
@@ -609,73 +591,49 @@
     color: #454548;
     margin-bottom: 50px;
   }
-  .step-wrapper{
-    margin-bottom: 50px;
+  .card{
+    margin-top: 20px;
   }
-  .card-item-wrapper{
-    margin-bottom: 10px;
+  .search-container{
+    display: flex;
+    justify-content: space-between;
+  }
+  .search-container .name{
+    margin-right: 10px;
   }
   .summary-content-header{
     font-size: 14px;
     color: #2d8cf0;
     font-weight: bold;
   }
+  .card-item-wrapper{
+    margin-bottom: 10px;
+  }
+  .property-row{
+    margin-top: 10px;
+  }
   .button-wrapper{
     margin-top: 20px;
     display: flex;
     justify-content: space-between;
   }
-  .browse-data-container{
-    width: 80%;
-    margin:0 auto;
-    padding: 90px 0;
-  }
-  .resource-list-title-container{
-    display: flex;
-    justify-content: space-between;
-  }
-  .search-button button{
-    width: 85px;
-  }
-    .readMore{
-      display: inline;
-    }
-    .card-content .step-title{
-      font-size: 14px;
-      color: #2d8cf0;
-      font-weight: bold;
-      margin:15px 0 0 0;
-    }
-    .modal-column-name{
-      font-size: 14px;
-      color: #2d8cf0;
-      font-weight: bold;
-      margin-bottom: 15px;
-    }
-    .card{
-      margin-top: 20px;
-    }
-    .property-row{
-      margin-top: 10px;
-    }
 </style>
 
 <style>
-    table{
-      margin-bottom: 0;
-    }
-    table thead th{
-      padding: 0px;
-    }
-    .readMore a{
-        font-size: 12px;
-        color: #495060;
-        border-bottom: 1px black dotted;
-    }
-    .readMore a:hover{
-        color: #2d8cf0;
-    }
-    .readMore span{
-        display: block;
-    }
+  .card.info .ivu-card-body{
+    height: 500px;
+    overflow-y: auto;
+  }
+  .readMore a{
+      font-size: 12px;
+      color: #495060;
+      border-bottom: 1px black dotted;
+  }
+  .readMore a:hover{
+      color: #2d8cf0;
+  }
+  .readMore span{
+      display: block;
+      margin-top: 15px;
+  }
 </style>
