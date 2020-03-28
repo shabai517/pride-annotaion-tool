@@ -1,54 +1,43 @@
 <template>
   <div class="annotate-container">
-      <!-- <div class="panel nav"><NavBar/></div> -->
       <div class="browse-data-container">
           <Row>
               <div class="title">
                   SDRF Annotation Tool
               </div>
               <div class="step-wrapper">
-                  <Steps :current="annotationStep">
-                      <Step title="Search" content="Find your project to annotate"></Step>
-                      <Step title="Check" content="Confirm your project information"></Step>
-                      <Step title="Sample" content="Give the number of samples"></Step>
-                      <Step title="Annotate" content="Add the raw file"></Step>
-                  </Steps>
+                  <Step :step="annotationStep" :des="stepDes"></Step>
               </div>
           </Row>
-          <div v-if="annotationStep == 3" class="stepFour">
-              <!--<Spin size="large" fix v-if="loading"></Spin>-->
-              <Row>
-                <selfTable class="sample-class-table"></selfTable>
-                <div class="button-wrapper">
-                    <div class="search-button">
-                        <Button type="primary" @click="back">Back</Button>
-                    </div>
-                    <!-- <div class="annotation-page">
-                      <Page :total="total" :page-size="pageSize" size="small" show-total @on-change="pageChange"></Page>
-                    </div> -->
-                    <div class="search-button right">
-                        <Button type="primary" @click="annotationSave">Save</Button>
-                        <Button type="primary" @click="annotationConfirm">Confirm</Button>
-                    </div>
+          <Row>
+            <selfTable class="sample-class-table" ></selfTable>
+            <div class="button-wrapper">
+                <div class="search-button">
+                    <Button type="primary" @click="back">Back</Button>
                 </div>
-              </Row>
-          </div>
+                <div class="search-button right">
+                    <Button type="primary" @click="annotationSave">Save</Button>
+                    <Button type="primary" @click="annotationConfirm">Confirm</Button>
+                </div>
+            </div>
+          </Row>
+         
       </div>
   </div>
 </template>
 
 <script>
-  //import NavBar from '@/components/ebi/Nav'
+  import Step from "@/components/step.vue"
   import selfTable from '@/components/table.vue'
   //var paramsFromLandingPage='';
   export default {
     name: 'annotate',
     data(){
       return {
-            annotationStep:3,
+            annotationStep:2,
+            stepDes:'Here is used to put the explanation about steps',
             title:'',
             keyword:'',
-            loading:true,
             total:0,
             //pageSize:100
       }
@@ -60,7 +49,7 @@
       next();
     },
     components: {
-      //NavBar,
+      Step,
       selfTable
     },
     methods:{
@@ -71,10 +60,8 @@
                 title: 'Uncompleted Annotaion',
                 content: '<p>Do you want to delete the uncompleted annotation?</p>',
                 onOk: () => {
-                    console.log('ok');
                     localStorage.clear();
-                    this.$router.push({path:'/annotation/'+this.$route.params.id+'/sample'});
-                    
+                    this.$router.push({name:'index'});
                 },
                 onCancel: () => {
                    
@@ -82,12 +69,8 @@
             });
         }
         else
-          this.$router.push({path:'/annotation/'+this.$route.params.id+'/sample'});
+          this.$router.push({path:'/sample/'+this.$route.params.id});
       },
-      // pageChange(page){
-      //   console.log(page)
-      //   this.$bus.$emit('annotation-page',{page:page,pageSize:this.pageSize});
-      // },
       annotationConfirm(){
           this.$Modal.confirm({
               title: 'Finish Annotation',
