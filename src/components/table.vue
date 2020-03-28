@@ -17,16 +17,6 @@
                             <div v-if="itemCol.key!='accession'">
                                   <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-change="getLabel(itemCol,itemRow)" @on-focus="focus($event,itemCol,itemRow,'sampledata',j)" @on-blur="inputBlur(itemRow[itemCol.key])">
                                   </Input>
-                                  <!-- <Dropdown class="dropdown-remote" trigger="custom" :visible="itemRow[itemCol.key].dropdown" placement="bottom-end" @on-click="dropdownClick($event,itemRow[itemCol.key])" @on-clickoutside="blur(itemRow[itemCol.key])">
-                                      <DropdownMenu slot="list">
-                                          <DropdownItem v-if="dropdownOptions.length == 0" name="nodata">No data
-                                              <Icon class="apply-all-button" type="arrow-down-a" size="15" @click.stop="applyAll('no data',itemCol,itemRow,'sampledata',j)"></Icon>
-                                          </DropdownItem>
-                                          <DropdownItem v-for="item in dropdownOptions" :name="item.name" :key="item.name">{{item.name}}
-                                              <Icon class="apply-all-button" type="arrow-down-a" size="15" @click.stop="applyAll(item.name,itemCol,itemRow,'sampledata',j)"></Icon>
-                                          </DropdownItem>
-                                      </DropdownMenu>
-                                  </Dropdown> -->
                             </div>
                             <div v-else>
                                 <div class="accession-col">
@@ -34,47 +24,6 @@
                                     <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-change="getLabel(itemCol,itemRow)" @on-blur="inputBlur(itemRow[itemCol.key])">
                                     </Input>
                                     <!-- <span>{{itemRow.accession}}</span> -->
-                                </div>
-                            </div>
-                            <div class="copy-icon"><Icon @click="showCopyModal(itemRow[itemCol.key],itemCol.key,j)" type="ios-copy-outline" size="16"></Icon></div>
-                      </div>
-                  </div>
-                  <div class="table-col" v-for="(itemCol,i) in msRunCol" :key="itemCol.key">
-                      <div class="table-row first msrun"><Icon v-if="itemCol.key!='fractionid'" class="icon-in-th-left" type="ios-remove-circle-outline" @click="removeAll(itemCol.key,'msrundata')" size="14"></Icon>{{itemCol.name}}</div>
-                      <div class="table-row" v-for="(itemRow,j) in msRunArray.slice(rowStart,rowEnd)" :key="j" :class="{hideRow:itemRow.disable}">
-                            <div v-if="itemCol.key=='label' || itemCol.key=='labelReagent'">
-                            <!--<div v-if="itemCol.key=='label'">-->
-                                  <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-change="getLabel(itemCol,itemRow)" @on-focus="focus($event,itemCol,itemRow,'msrundata',j)" @on-blur="inputBlur(itemRow[itemCol.key])"></Input>
-                                  <!-- <Dropdown class="dropdown-remote" trigger="custom" :visible="itemRow[itemCol.key].dropdown" placement="bottom-end" @on-click="dropdownClick($event,itemRow[itemCol.key])" @on-clickoutside="blur(itemRow[itemCol.key])">
-                                      <DropdownMenu slot="list">
-                                          <DropdownItem v-if="dropdownOptions.length == 0" name="nodata">No data
-                                              <Icon class="apply-all-button" type="arrow-down-a" size="15" @click.stop="applyAll('no data',itemCol,itemRow,'msrundata',j)"></Icon>
-                                          </DropdownItem>
-                                          <DropdownItem v-for="item in dropdownOptions" :name="item.name" :key="item.name">{{item.name}}
-                                              <Icon class="apply-all-button" type="arrow-down-a" size="15" @click.stop="applyAll(item.name,itemCol,itemRow,'msrundata',j)"></Icon>
-                                          </DropdownItem>
-                                      </DropdownMenu>
-                                  </Dropdown> -->
-                            </div>
-                            <div v-else-if="itemCol.key=='msrun'">
-                              <div class="msRun-button-wrapper" v-if="itemRow[itemCol.key].value">
-                                  <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-blur="inputBlur(itemRow[itemCol.key])"></Input>
-                                  <!-- <Tooltip max-width="200" class="show-button-tooltip" placement="right">
-                                      <a class="button search-button finish" @click="showMsRunTable(itemRow,j)">Finish</a> 
-                                      <div class="tooltip-content" slot="content">
-                                          {{itemRow[itemCol.key].file}}
-                                      </div>
-                                  </Tooltip>
-                                  <Icon color="rgba(0, 0, 0, 0.6)" type="ios-close"  size="16" style="margin-left:5px" @click="itemRow[itemCol.key].file=''"/> -->
-                              </div>
-                              <div v-else>
-                                    <Button @click="showMsRunTable(itemRow,j)" long>Edit</Button> 
-                              </div>
-                            </div>
-                            <div v-else>
-                                <div class="accession-col">
-                                  <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-change="getLabel(itemCol,itemRow)"  @on-blur="inputBlur(itemRow[itemCol.key])"></Input>
-                                  <!-- <span>{{itemRow.fractionid.value}}</span> -->
                                 </div>
                             </div>
                             <div class="copy-icon"><Icon @click="showCopyModal(itemRow[itemCol.key],itemCol.key,j)" type="ios-copy-outline" size="16"></Icon></div>
@@ -267,47 +216,6 @@
           sampleNumber:0,
           fractionNumber:0,
           trNumber:0,
-          msRunCol:[
-              {
-                //experimentType:res.body[i].first,
-                //required: res.body[i].second == 'REQUIRED'? true:false,
-                //cvLabel:res.body[i].third.cvLabel.toLowerCase(),
-                //accession:res.body[i].third.accession,
-                name:'FractionID',
-                //orignal_name:res.body[i].third.name,
-                key: 'fractionid',
-              },
-              {
-                //experimentType:res.body[i].first,
-                //required: res.body[i].second == 'REQUIRED'? true:false,
-                //cvLabel:res.body[i].third.cvLabel.toLowerCase(),
-                //accession:res.body[i].third.accession,
-                name:'Label',
-                //orignal_name:res.body[i].third.name,
-                key: 'label',
-              },
-              
-              {
-                //experimentType:res.body[i].first,
-                //required: res.body[i].second == 'REQUIRED'? true:false,
-                //cvLabel:res.body[i].third.cvLabel.toLowerCase(),
-                //accession:res.body[i].third.accession,
-                name:'LabelReagent',
-                //orignal_name:res.body[i].third.name,
-                key: 'labelReagent',
-              },
-
-              {
-                //experimentType:res.body[i].first,
-                //required: res.body[i].second == 'REQUIRED'? true:false,
-                //cvLabel:res.body[i].third.cvLabel.toLowerCase(),
-                //accession:res.body[i].third.accession,
-                name:'MSRun',
-                //orignal_name:res.body[i].third.name,
-                key: 'msrun',
-              }
-          ],
-          msRunArray:[],
           accessionKey:0,
           msRunTableRowID:'',
           selectedFileItem:{},
@@ -440,74 +348,24 @@
                   return;
               }
               this.dropdownOptions=[];
-              if(itemCol.key=='label'){
-                  let query={
-                    keyword:searchValue
-                  }
-                  clearTimeout(this.timeoutId);
-                  this.timeoutId = 0;
-                  this.timeoutId = setTimeout( async()=> {
-                      try{
-                          let res = await this.$Api.getLabel(query)
-                          if(this.timeoutId == 0)
-                            return;
-                          if(!itemRow[itemCol.key].active)
-                            return;
-                          if(res.body.length>0 || searchValue){
-                            this.dropdown.visible = true
-                          }
-                          this.dropdownOptions=res.body;
-                          if(this.dropdownOptions.length == 0){
-                              itemRow[itemCol.key].value==searchValue;
-                          }
-                      }
-                      catch(e){
-                        console.log(e.message)
-                      }
-                  }, 500);
+              let query={
+                attributeAccession: itemCol.accession,
+                ontologyAccession: itemCol.cvLabel,
+                keyword:searchValue
               }
-              else if(itemCol.key=='labelReagent'){ 
-                let query={
-                    keyword: searchValue,
-                }
-                clearTimeout(this.timeoutId);
-                this.timeoutId = 0;
-                this.timeoutId = setTimeout( async()=> {
+              clearTimeout(this.timeoutId);
+              this.timeoutId = 0;
+              this.timeoutId = setTimeout( async()=> {
                     try{
-                        let res = await this.$Api.getLabelReagent(query)
+                        let res = await this.$Api.getValuesByAttributes(query) 
                         if(this.timeoutId == 0)
                           return;
                         if(!itemRow[itemCol.key].active)
                           return;
-                        if(res.body.length>0 || searchValue)
+                        if(res.body.length>0 || searchValue){
+                          //itemRow[itemCol.key].dropdown=true;
                           this.dropdown.visible = true
-
-
-                        this.dropdownOptions=res.body;
-                        if(this.dropdownOptions.length == 0){
-                            itemRow[itemCol.key].value==searchValue;
                         }
-                    }
-                    catch(e){
-                      console.log(e.message)
-                    }
-                }, 500);
-              }
-              else if(itemCol.key=='msrun'){
-                  let query={
-                      accession: this.$route.params.id,
-                  }
-                  clearTimeout(this.timeoutId);
-                  this.timeoutId = 0;
-                  this.timeoutId = setTimeout( async()=> {
-                    try{
-                        let res = await this.$Api.getMSRunTableData(query) 
-                        if(this.timeoutId == 0)
-                          return;
-                        if(!itemRow[itemCol.key].active)
-                          return;
-                        if(res.body.length>0 || searchValue)
-                          this.dropdown.visible = true
 
                         this.dropdownOptions=res.body;
                         if(this.dropdownOptions.length == 0){
@@ -517,38 +375,7 @@
                     catch(e){
                         console.log(e.message)
                     }
-                  }, 500);
-              }
-              else{
-                let query={
-                  attributeAccession: itemCol.accession,
-                  ontologyAccession: itemCol.cvLabel,
-                  keyword:searchValue
-                }
-                clearTimeout(this.timeoutId);
-                this.timeoutId = 0;
-                this.timeoutId = setTimeout( async()=> {
-                      try{
-                          let res = await this.$Api.getValuesByAttributes(query) 
-                          if(this.timeoutId == 0)
-                            return;
-                          if(!itemRow[itemCol.key].active)
-                            return;
-                          if(res.body.length>0 || searchValue){
-                            //itemRow[itemCol.key].dropdown=true;
-                            this.dropdown.visible = true
-                          }
-
-                          this.dropdownOptions=res.body;
-                          if(this.dropdownOptions.length == 0){
-                              itemRow[itemCol.key].value==searchValue;
-                          }
-                      }
-                      catch(e){
-                          console.log(e.message)
-                      }
-                }, 500);
-              }
+              }, 500);
               this.$forceUpdate();
           },
           titleCase(str) {
@@ -804,13 +631,6 @@
                           this.sampleData[i][itemCol.key] = newItem;
                         
                     }
-                  else if(type == 'msrundata'){
-                    for(let i=index;i<this.msRunArray.length; i++){
-                        let newItem =  JSON.parse(JSON.stringify(itemRow[itemCol.key]));
-                        if(tempValue == this.msRunArray[i][itemCol.key].value || !this.msRunArray[i][itemCol.key].value)
-                          this.msRunArray[i][itemCol.key] = newItem;
-                    }
-                  }
                   this.blur(itemRow[itemCol.key]);
               });
           },
@@ -823,20 +643,12 @@
                     if(this.sampleData[i][key].col.required)
                         this.sampleData[i][key].checked = false;
                 }
-              else if(type == 'msrundata')
-                for(let i=0;i<this.msRunArray.length; i++){
-                    this.msRunArray[i][key].value = '';
-                    if(this.msRunArray[i][key].col.required)
-                        this.msRunArray[i][key].checked = false;
-                }
           },
           init(){
             let tempSampleData = JSON.parse(localStorage.getItem("sampleData"));
-            let tempMSRunArray = JSON.parse(localStorage.getItem("msRunArray"));
+            
             if(tempSampleData)
               this.sampleData = tempSampleData;
-            if(tempMSRunArray)
-              this.msRunArray = tempMSRunArray;
 
             this.experimentType = localStorage.getItem('selectedExperimentType')
             this.sampleNumber  = +localStorage.getItem("samplesNum")
@@ -871,34 +683,9 @@
                         }
                   }
               }
-              //check for msruntable data completed
-              for(let i=0; i<this.msRunArray.length; i++){
-                   for(let j in this.msRunArray[i]){
-                          if(j=='fractionid'){
-                              continue;
-                          }
-                          else if(j=="accessionKey"){
-                            continue;
-                          }
-                          else if(j=="msrun"){
-                            //we should change this code when msrun table is ready.
-                            continue;
-                          }
-                          else if(j=="label"){
-                              if(!this.msRunArray[i][j].value && this.msRunArray[i][j].col.required){
-                                  msRunCheckPass=false;
-                                  this.msRunArray[i][j].checked=false;
-                              }
-                              else{
-                                  this.msRunArray[i][j].checked=true;
-
-                              }
-                          }
-                    }
-              }
               console.log('sampleDataCheckPass',sampleDataCheckPass);
               console.log('msRunCheckPass',msRunCheckPass);
-              if(sampleDataCheckPass&&msRunCheckPass){
+              if(sampleDataCheckPass){
               //if(true){
                   console.log('pass');
                   let submitData = [];
@@ -906,8 +693,6 @@
                       let item = {};
                       item.projectAccession = this.$route.params.id;
                       item.sampleAccession = this.sampleData[i].accession.value;
-                      item.fractionAccession = this.msRunArray[i].fractionid.value;
-                      item.msRunAccession = this.msRunArray[i].msrun.value;
                       item.sampleProperties = [];
                       for(let j in this.sampleData[i]){
                           let sampleItem = {};
@@ -974,15 +759,9 @@
               }
           },
           save(){
-
               let sampleDataStr = JSON.stringify(this.sampleData);
-              let msRunArrayStr = JSON.stringify(this.msRunArray);
               if(this.sampleData.length>0)
                 this.localStorageItemAdd('sampleData', sampleDataStr);
-
-              if(this.msRunArray.length>0)
-                this.localStorageItemAdd('msRunArray', msRunArrayStr);
-
 
               localStorage.setItem('projectAccession',this.$route.params.id);
               localStorage.setItem('selectedExperimentType',this.experimentType);
@@ -1062,71 +841,9 @@
               setTimeout(()=>{
                 this.tableLoading=false;
               },50)
-            if(!JSON.parse(localStorage.getItem("msRunArray")))
-              this.msRunArray=this.sampleData.map((sampleItem,index)=>{
-                  let item={
-                        label:{
-                              value:'',
-                              dropdown:false,
-                              accession:'null',
-                              cvLabel:'null',
-                              col:{
-                                required:true
-                              },
-                              icon:'',
-                              checked:true,
-                        },
-                        labelReagent:{
-                              value:'',
-                              dropdown:false,
-                              accession:'null',
-                              cvLabel:'null',
-                              col:{
-                                required:true
-                              },
-                              icon:'',
-                              checked:true,
-                        },
-                        msrun:{
-                              value:'',
-                              dropdown:false,
-                              accession:'null',
-                              cvLabel:'null',
-                              col:{
-                                required:true
-                              },
-                              icon:'',
-                              checked:true,
-                        },
-                        fractionid:{
-                              id:sampleItem.accession+'_F'+(index+1),
-                              value:'F'+(index+1),
-                              dropdown:false,
-                              accession:'null',
-                              cvLabel:'null',
-                              col:{},
-                              icon:'',
-                              checked:true,
-                        },
-                        accessionKey:sampleItem.accessionKey,
-                        disable:sampleItem.disable
-                  }
-                  return item;
-              })
-            else
-              return;
-          },
+          }
           deep:true
-        },
-        msRunArray:{
-          handler(){
-            if(this.msRunArray.length>0)
-              setTimeout(()=>{
-                this.tableLoading=false;
-              },50)
-          },
-          deep:true
-        },
+        }
     },
     computed:{
       // listSample: function(){
@@ -1138,7 +855,7 @@
     },
     mounted: function(){
       this.getSampleAttributes();
-      this.getMSRunTableData();
+      //this.getMSRunTableData();
       this.init();
     },
     computed:{
