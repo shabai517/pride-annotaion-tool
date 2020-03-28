@@ -7,103 +7,95 @@
                   SDRF Annotation Tool
               </div>
               <div class="step-wrapper">
-                  <Steps :current="annotationStep">
-                      <Step title="Search" content="Find your project to annotate"></Step>
-                      <Step title="Check" content="Confirm your project information"></Step>
-                      <Step title="Sample" content="Give the number of samples"></Step>
-                      <Step title="Annotate" content="Add the raw file"></Step>
-                  </Steps>
+                 <Step :step="annotationStep" :des="stepDes"></Step>
               </div>
           </Row>
- 
-          <div v-if="annotationStep == 2" class="stepThree">
-              <!--<Spin size="large" fix v-if="loading"></Spin>-->
-              <Row>
-                <Card>
-                    <p slot="title" class="resource-list-title-container">
-                      <span>Input Numbers</span>
-                    </p>
-                    <div class="card-content">
-                         <div class="step-title">1. Choose the experiment type 
-                            <Tooltip class="step-title-tooltip" placement="right">
-                                <Icon type="help-circled"></Icon>
-                                <div slot="content">
-                                    <p>Display multiple lines of information</p>
-                                    <p><i>Can customize the style</i></p>
-                                </div>
-                            </Tooltip>
-                         </div>
-                         <div class="experiment-type-wrapper">
-                            <div v-for="item in annotateExperiment" :class="item.class" @click="experimentTypeChoose(item)">
-                              <span :class="{selectedExperimentText:item.check}">{{item.value}}</span>
+          <Row>
+            <Card>
+                <p slot="title" class="resource-list-title-container">
+                  <span>Input Numbers</span>
+                </p>
+                <div class="card-content">
+                     <div class="step-title">1. Choose the experiment type 
+                        <Tooltip class="step-title-tooltip" placement="right">
+                            <Icon type="help-circled"></Icon>
+                            <div slot="content">
+                                <p>Display multiple lines of information</p>
+                                <p><i>Can customize the style</i></p>
                             </div>
-                         </div>
-                         <div class="step-title">2. Input Samples Number 
-                            <Tooltip class="step-title-tooltip" placement="right">
-                                <Icon type="help-circled"></Icon>
-                                <div slot="content">
-                                    <p>Display multiple lines of information</p>
-                                    <p><i>Can customize the style</i></p>
-                                </div>
-                            </Tooltip>
-                         </div>
-                         <div class="number-wrapper">
-                             <!--<span>Samples</span>-->
-                             <InputNumber class="input-number" v-model="samplesNum" size="small" :min='1'></InputNumber>
-                         </div>
-                         <!--
-                         <div class="step-title">3. Input Technical Number 
-                            <Tooltip class="step-title-tooltip" placement="right">
-                                <Icon type="help-circled"></Icon>
-                                <div slot="content">
-                                    <p>Display multiple lines of information</p>
-                                    <p><i>Can customize the style</i></p>
-                                </div>
-                            </Tooltip>
-                         </div>
-                         
-                         <div class="number-wrapper">
-                             <InputNumber class="input-number"  v-model="trNum" size="small" :min='1'></InputNumber>
-                         </div>
-                         -->
-                         <div class="step-title">3. Input Fractions Number 
-                              <Tooltip class="step-title-tooltip" placement="right">
-                                <Icon type="help-circled"></Icon>
-                                <div slot="content">
-                                    <p>Display multiple lines of information</p>
-                                    <p><i>Can customize the style</i></p>
-                                </div>
-                            </Tooltip>
-                         </div>
-                         
-                         <div  class="number-wrapper">
-                             <InputNumber class="input-number"  v-model="fractionsNum" size="small" :min='1'></InputNumber>
-                         </div>
-                         
-                    </div>
-                </Card>
-                <div class="button-wrapper">
-                    <div class="search-button">
-                        <Button type="primary" @click="back">Back</Button>
-                    </div>
-                    <div class="search-button">
-                        <Button type="primary" @click="next">Next</Button>
-                    </div>
+                        </Tooltip>
+                     </div>
+                     <div class="experiment-type-wrapper">
+                        <div v-for="item in annotateExperiment" :class="item.class" @click="experimentTypeChoose(item)">
+                          <span :class="{selectedExperimentText:item.check}">{{item.value}}</span>
+                        </div>
+                     </div>
+                     <div class="step-title">2. Input Samples Number 
+                        <Tooltip class="step-title-tooltip" placement="right">
+                            <Icon type="help-circled"></Icon>
+                            <div slot="content">
+                                <p>Display multiple lines of information</p>
+                                <p><i>Can customize the style</i></p>
+                            </div>
+                        </Tooltip>
+                     </div>
+                     <div class="number-wrapper">
+                         <!--<span>Samples</span>-->
+                         <InputNumber class="input-number" v-model="samplesNum" size="small" :min='1'></InputNumber>
+                     </div>
+                     <!--
+                     <div class="step-title">3. Input Technical Number 
+                        <Tooltip class="step-title-tooltip" placement="right">
+                            <Icon type="help-circled"></Icon>
+                            <div slot="content">
+                                <p>Display multiple lines of information</p>
+                                <p><i>Can customize the style</i></p>
+                            </div>
+                        </Tooltip>
+                     </div>
+                     
+                     <div class="number-wrapper">
+                         <InputNumber class="input-number"  v-model="trNum" size="small" :min='1'></InputNumber>
+                     </div>
+                     -->
+                     <div class="step-title">3. Input Fractions Number 
+                          <Tooltip class="step-title-tooltip" placement="right">
+                            <Icon type="help-circled"></Icon>
+                            <div slot="content">
+                                <p>Display multiple lines of information</p>
+                                <p><i>Can customize the style</i></p>
+                            </div>
+                        </Tooltip>
+                     </div>
+                     
+                     <div  class="number-wrapper">
+                         <InputNumber class="input-number"  v-model="fractionsNum" size="small" :min='1'></InputNumber>
+                     </div>
+                     
                 </div>
-              </Row>
-          </div>
+            </Card>
+            <div class="button-wrapper">
+                <div class="search-button">
+                    <Button type="primary" @click="back">Back</Button>
+                </div>
+                <div class="search-button">
+                    <Button type="primary" @click="next">Next</Button>
+                </div>
+            </div>
+          </Row>
       </div>
     
   </div>
 </template>
 
 <script>
-  // import NavBar from '@/components/ebi/Nav'
+  import Step from "@/components/step.vue"
   export default {
     name: 'sample',
     data(){
       return {
-            annotationStep:2,
+            annotationStep:1,
+            stepDes:'Here is used to put the explanation about steps',
             accession:'',
             title:'',
             species:[],
@@ -158,11 +150,11 @@
       next();
     },
     components: {
-      //NavBar,
+      Step
     },
     methods:{
       back(){
-        this.$router.push({path:'/annotation/'+this.$route.params.id+'/check'});
+        this.$router.push({name:'check'});
       },
       next(){
         let found = false;
@@ -176,7 +168,7 @@
           return;
         }
         this.saveSampleInfo();
-        this.$router.push({path:'/annotation/'+this.$route.params.id+'/annotate'});
+        this.$router.push({path:'/annotate/'+this.$route.params.id});
       },
       handleDelete (params) {
         console.log(params)
