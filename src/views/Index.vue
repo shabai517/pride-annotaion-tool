@@ -22,10 +22,10 @@
         },
         methods:{
             gotoPublicDataset(){
-                this.$router.push({ name: 'checkdataset'});
+                this.$router.push({ name: 'check'});
             },
             gotoNewDataset(){
-                this.$router.push({ name: 'annotation'});
+                //this.$router.push({ name: 'annotation'});
             },
             gotosSRDF(){
                 this.$router.push({ name: 'srdf'});
