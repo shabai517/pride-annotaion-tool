@@ -2,11 +2,9 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 const Index = () => import('./views/Index.vue')
-const Annotation = () => import('./views/Annotation.vue')
 const Check = () => import('./views/Check.vue')
 const Sample = () => import('./views/Sample.vue')
 const Annotate = () => import('./views/Annotate.vue')
-const CheckDataset = () => import('./views/CheckDataset.vue')
 const Srdf = () => import('./views/Srdf.vue')
 
 Vue.use(Router)
@@ -19,27 +17,17 @@ export default new Router({
       component: Index,
     },
     {
-      path:'/checkdataset',
-      name: 'checkdataset',
-      component: CheckDataset,
-    },
-    {
-      path:'/annotation',
-      name: 'annotation',
-      component: Annotation,
-    },
-    {
-      path:'/annotation/:id/check',
+      path:'/check',
       name: 'check',
       component: Check,
     },
     {
-      path:'/annotation/:id/sample',
+      path:'/sample/:id',
       name: 'sample',
       component: Sample,
     },
     {
-      path:'/annotation/:id/annotate',
+      path:'/annotate/:id',
       name: 'annotate',
       component: Annotate,
     },
