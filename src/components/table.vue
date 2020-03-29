@@ -15,13 +15,13 @@
                       <div class="table-row first handle"><Icon v-if="itemCol.key!='accession'" class="icon-in-th-left" type="ios-remove-circle-outline" @click="removeAll(itemCol.key,'sampledata')" size="14"></Icon>{{itemCol.name}}<Icon class="icon-in-th-right" type="ios-remove-circle-outline" v-if="!itemCol.required" @click="deleteCol(itemCol,i)" size="14"></Icon></div>
                       <div class="table-row" v-for="(itemRow,j) in sampleData.slice(rowStart,rowEnd)">
                             <div v-if="itemCol.key!='accession'">
-                                  <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-change="getLabel(itemCol,itemRow)" @on-focus="focus($event,itemCol,itemRow,'sampledata',j)" @on-blur="inputBlur(itemRow[itemCol.key])">
+                                  <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-change="getAutoCompleteList(itemCol,itemRow)" @on-focus="focus($event,itemCol,itemRow,'sampledata',j)" @on-blur="inputBlur(itemRow[itemCol.key])">
                                   </Input>
                             </div>
                             <div v-else>
                                 <div class="accession-col">
                                     <Icon v-if="sampleData.length>1 && j == sampleData.length-1" class="icon-in-row" type="ios-remove-circle-outline" @click="deleteRow(itemRow,j)" size="14"></Icon>
-                                    <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-change="getLabel(itemCol,itemRow)" @on-blur="inputBlur(itemRow[itemCol.key])">
+                                    <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-change="getAutoCompleteList(itemCol,itemRow)" @on-blur="inputBlur(itemRow[itemCol.key])">
                                     </Input>
                                     <!-- <span>{{itemRow.accession}}</span> -->
                                 </div>
@@ -86,17 +86,18 @@
 </template>
 
 <script>
-  //import draggable from 'vuedraggable'
+  import { cloneDeep } from 'lodash'
   import store from "@/store.js"
-  
   export default {
     name: 'archive',
+    props: ['columns','data','loading'],
     data(){
       return {
+          sampleData: cloneDeep(data),
+          sampleCol: cloneDeep(columns),
           tokenApi:this.$store.state.baseApiURL + '/getAAPToken', 
           updateSampleApi:this.$store.state.baseApiURL + '/annotator/'+this.$route.params.id+'/updateSampleMsRuns',
           visible:true,
-          loading1:false,
           addColumnBool:false,
           drawerShowBool:false,
           newColumnNameSelectedArray:[],
@@ -246,99 +247,7 @@
       //ModelSelect
     },
     methods:{
-          async getSampleAttributes(){
-              this.tableLoading=true
-              this.sampleColQueryState=false
-              this.sampleData=[];
-              this.sampleCol=[
-                  {
-                      name:'Accession',
-                      key:'accession',
-                      required:true,
-                  },
-              ];
-              try{
-                  let res = await this.$Api.getSampleAttributes()
-                  this.tableLoading = false
-                  this.sampleColQueryState=true
-                  let sampleDataItem={};//temp sampledata item for table rows
-                  for(let i=0; i<res.body.length; i++){
-                      if(res.body[i].first == this.experimentType){
-                          let item = {
-                            experimentType:res.body[i].first,
-                            required: res.body[i].second == 'REQUIRED'? true:false,
-                            cvLabel:res.body[i].third.cvLabel.toLowerCase(),
-                            accession:res.body[i].third.accession,
-                            name:this.titleCase(res.body[i].third.name),
-                            orignal_name:res.body[i].third.name,
-                            key: this.titleCase(res.body[i].third.name).toLowerCase().replace(/\s/ig,''),
-                          }
-                          //we are creating sample table columns
-                          if(item.required)
-                            this.sampleCol.push(item);
-                          this.newData.push(item);
-                          //we are creating sample table rows
-                          //sampleDataItem.accession={};//we will apply for the value for ac
-                          sampleDataItem[item.key]={
-                              value:'',
-                              dropdown:false,
-                              accession:'null',
-                              accessionKey:this.accessionKey,
-                              cvLabel:'null',
-                              col:item,
-                              icon:'',
-                              checked:true,
-                          }
-                      }
-                  }
-                  let projectAccession = localStorage.getItem("projectAccession")
-                  if(!projectAccession){
-                      for(let k=0; k<this.sampleNumber * this.fractionNumber; k++){
-                            let item = JSON.parse(JSON.stringify(sampleDataItem))
-                            item.accession={
-                                value:"PXD_S"+(k+1),
-                                dropdown:false,
-                                accession:'null',
-                                accessionKey:this.accessionKey++,
-                                cvLabel:'null',
-                                col:this.sampleCol[0],
-                                icon:'',
-                                checked:true,
-                            }
-                            //if(item.col.required)
-                              this.sampleData.push(item)
-                      }    
-                  }
-              }
-              catch(e){
-                  this.tableLoading = false
-                  this.sampleColQueryState=false
-                  console.log(e.message)
-              }
-          },
-          async getMSRunTableData(){
-              this.msRunModalTableData=[];
-              let query={
-                  accession: this.$route.params.id,
-                  //accession:'PXD014344'
-              }
-              try{
-                 let res = await this.$Api.getMSRunTableData(query)
-                 for(let i of res.body){
-                      let item = {
-                        accession:i.accession,
-                        name:i.fileName,
-                        size:Math.round(i.fileSizeBytes/1024/1024),
-                        select:false,
-                      }
-                      this.msRunModalTableData.push(item);
-                  }
-              }
-              catch(e){
-                  console.log(e.message)
-              }
-          },
-          async getLabel(itemCol,itemRow){
+          async getAutoCompleteList(itemCol,itemRow){
               let searchValue = itemRow[itemCol.key].value;
               if(searchValue)
                   itemRow[itemCol.key].icon = 'close-circled'
@@ -405,7 +314,7 @@
               console.log(this.dropdown);
               if(!itemRow[itemCol.key].value)
                 return;
-              this.getLabel(itemCol,itemRow);
+              this.getAutoCompleteList(itemCol,itemRow);
           },
           inputBlur(item){
             this.pasteIndex = null;
@@ -644,139 +553,6 @@
                         this.sampleData[i][key].checked = false;
                 }
           },
-          init(){
-            let tempSampleData = JSON.parse(localStorage.getItem("sampleData"));
-            
-            if(tempSampleData)
-              this.sampleData = tempSampleData;
-
-            this.experimentType = localStorage.getItem('selectedExperimentType')
-            this.sampleNumber  = +localStorage.getItem("samplesNum")
-            this.fractionNumber = +localStorage.getItem("fractionsNum")
-            this.trNumber = +localStorage.getItem("trNum")
-          },
-          confirm(){
-              let results = [];
-              let tempAccession='';
-              let sampleDataCheckPass=true;
-              let msRunCheckPass= true;
-              console.log('this.sampleData',this.sampleData);
-              console.log('this.msRunArray',this.msRunArray)
-              //check for sample data completed
-              for(let i=0; i<this.sampleData.length; i++){
-                  for(let j in this.sampleData[i]){
-                        if(j=='accession'){
-                            tempAccession = this.sampleData[i][j];
-                            continue;
-                        }
-                        else if(j=="accessionKey"){
-                          continue;
-                        }
-                        else{
-                            if(!this.sampleData[i][j].value && this.sampleData[i][j].col.required){
-                                sampleDataCheckPass=false;
-                                this.sampleData[i][j].checked=false;
-                            }
-                            else{
-                                 this.sampleData[i][j].checked=true;
-                            }
-                        }
-                  }
-              }
-              console.log('sampleDataCheckPass',sampleDataCheckPass);
-              console.log('msRunCheckPass',msRunCheckPass);
-              if(sampleDataCheckPass){
-              //if(true){
-                  console.log('pass');
-                  let submitData = [];
-                  for(let i=0; i<this.sampleData.length; i++){
-                      let item = {};
-                      item.projectAccession = this.$route.params.id;
-                      item.sampleAccession = this.sampleData[i].accession.value;
-                      item.sampleProperties = [];
-                      for(let j in this.sampleData[i]){
-                          let sampleItem = {};
-                          if(j == 'accession' || j == 'accessionKey' || j == 'disable')
-                            continue;
-                          else{
-                              sampleItem.key={};
-                              sampleItem.key.accession=this.sampleData[i][j].col.accession; 
-                              sampleItem.key.cvLabel=this.sampleData[i][j].col.cvLabel;
-                              sampleItem.key.name=this.sampleData[i][j].col.name;
-                              sampleItem.key.value=this.sampleData[i][j].col.orignal_name;
-                              sampleItem.value={};
-                              sampleItem.value.accession=this.sampleData[i][j].accession;
-                              sampleItem.value.cvLabel=this.sampleData[i][j].cvLabel;
-                              sampleItem.value.name=this.sampleData[i][j].col.name;
-                              sampleItem.value.value=this.sampleData[i][j].value;
-                              item.sampleProperties.push(sampleItem);
-                          }  
-                      }
-                      item.msrunProperties = [];//TODO 
-                      let sampleLable={
-                          accession: this.msRunArray[i].label.accession,
-                          cvLabel: this.msRunArray[i].label.cvLabel,
-                          name: this.msRunArray[i].label.value,
-                          value: ''
-                      }
-                      item.sampleLabel = sampleLable;
-                      let labelReagent = {
-                          accession: this.msRunArray[i].labelReagent.accession,
-                          cvLabel: this.msRunArray[i].labelReagent.cvLabel,
-                          name: this.msRunArray[i].labelReagent.value,
-                          value: ''
-                      }
-                      item.labelReagent = labelReagent;
-
-                      if(!this.sampleData[i].disable)
-                        submitData.push(item);
-                  }
-                  let sendData = {};
-                  sendData.SampleMSRunTable = {};
-                  sendData.SampleMSRunTable.sampleMSRunRows = submitData;
-                  console.log('sendData',sendData)
-                  this.$http
-                      .put(this.updateSampleApi,sendData,{
-                        headers: {
-                          'Authorization':'Bearer '+ localStorage.getItem('token')
-                        }
-                      })
-                      .then(function(res){
-                        console.log('success',res);
-                        this.$Message.success({content:'Annotation Success', duration:1});
-                        localStorage.clear();
-                        this.$router.push({path:'/annotation'});
-                      },function(err){
-                        console.log('err',err);
-                        if(err.body.error == 'TOKEN_EXPIRED'){
-                            this.logout();
-                        }
-                        this.$Message.error({content:'Annotation Error', duration:1});
-                      });
-              }
-              else{
-                this.$Message.error({content:'Fill required content', duration:1});
-              }
-          },
-          save(){
-              let sampleDataStr = JSON.stringify(this.sampleData);
-              if(this.sampleData.length>0)
-                this.localStorageItemAdd('sampleData', sampleDataStr);
-
-              localStorage.setItem('projectAccession',this.$route.params.id);
-              localStorage.setItem('selectedExperimentType',this.experimentType);
-              localStorage.setItem('samplesNum',this.sampleNumber);
-              localStorage.setItem('fractionsNum',this.fractionNumber);
-              localStorage.setItem('trNum',this.trNumber);
-
-              this.$Message.success({content:'Save Successfully', duration:1});
-              //let sampleDataB64 = Base64.encode(sampleDataStr)  TODO for backend.
-          },
-          logout(){
-            localStorage.setItem('username','');
-            localStorage.setItem('token','');
-            this.$router.push({name:'annotation'})
-          },
           localStorageItemAdd(key,data){
               localStorage.setItem(key,data);
           },
@@ -839,7 +615,7 @@
           handler(){
             if(this.sampleData.length>0 || this.msRunArray.length>0)
               setTimeout(()=>{
-                this.tableLoading=false;
+                this.$emit('update', this.sampleData)
               },50)
           }
           deep:true
@@ -854,11 +630,6 @@
       // },
     },
     mounted: function(){
-      this.getSampleAttributes();
-      //this.getMSRunTableData();
-      this.init();
-    },
-    computed:{
 
     },
     created(){
