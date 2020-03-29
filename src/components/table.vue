@@ -2,14 +2,17 @@
   <div class="archive-container">
       <Card id="sample-card" class="card annotation">
           <p slot="title" class="resource-list-title-container">
-            <span>Sample</span>
+            <span>{{name}}</span>
           </p>
-          <p slot="extra" class="sample-table-extra">
-            <a @click="showModal"><span>Add Property</span><Icon type="ios-add" size="20"></Icon></a>
-            <a @click="addRow"><span>Add Sample</span><Icon class="add-row-icon" type="ios-add" size="20"></Icon></a>
+          <p v-if="sampleData.length>0 && sampleCol.length>0" slot="extra" class="sample-table-extra">
+            <a @click="showAddColModal"><span>Add Col</span><Icon type="ios-add" size="20"></Icon></a>
+            <a @click="addRow"><span>Add Row</span><Icon class="add-row-icon" type="ios-add" size="20"></Icon></a>
           </p>
-          <div  class="card-content" @scroll="scroll">
-              <div v-if="sampleColQueryState && !tableLoading">
+          <div class="card-content" @scroll="scroll" :style="{height:height + 'px'}">
+              <div v-if="sampleData.length == 0" class="no-data-table-wrapper">
+                  <span>No data</span>
+              </div>
+              <div v-else>
                   <div :style="{'padding-top': rowStart*45+'px'}"></div>
                   <div class="table-col" v-for="(itemCol,i) in sampleCol" :key="itemCol.key">
                       <div class="table-row first handle"><Icon v-if="itemCol.key!='accession'" class="icon-in-th-left" type="ios-remove-circle-outline" @click="removeAll(itemCol.key,'sampledata')" size="14"></Icon>{{itemCol.name}}<Icon class="icon-in-th-right" type="ios-remove-circle-outline" v-if="!itemCol.required" @click="deleteCol(itemCol,i)" size="14"></Icon></div>
@@ -35,9 +38,6 @@
                   </div>
                   <div :style="{'padding-top': rowStart*30+'px'}"></div>
               </div>
-              <div v-else-if="!sampleColQueryState && !tableLoading" class="no-data-table-wrapper">
-                  <span>No data</span>
-              </div>
           </div>
           <Dropdown class="dropdown-remote" :style="{left:dropdown.left + 'px', top:dropdown.top + 'px'}" trigger="custom" :visible="dropdown.visible" placement="bottom-end" @on-click="dropdownClick($event,dropdown.row[dropdown.col.key])">
               <DropdownMenu slot="list">
@@ -57,7 +57,7 @@
           :closable="false"
           @on-ok="addCol"
           @on-visible-change="modalVisibleChange">
-          <Table border ref="addPropertyTable" class="add-col-table" :columns="newCol" :data="newData" @on-selection-change="newColSelectChange"></Table>
+          <Table border ref="addPropertyTable" class="add-col-table" :columns="newCol" :data="sampleCol" @on-selection-change="newColSelectChange"></Table>
       </Modal>
       <Modal
           title="Copy"
@@ -90,11 +90,11 @@
   import store from "@/store.js"
   export default {
     name: 'archive',
-    props: ['columns','data','loading'],
+    props: ['columns','data','loading','height','name'],
     data(){
       return {
-          sampleData: cloneDeep(data),
-          sampleCol: cloneDeep(columns),
+          sampleData: cloneDeep(this.data),
+          sampleCol: cloneDeep(this.columns),
           tokenApi:this.$store.state.baseApiURL + '/getAAPToken', 
           updateSampleApi:this.$store.state.baseApiURL + '/annotator/'+this.$route.params.id+'/updateSampleMsRuns',
           visible:true,
@@ -209,9 +209,6 @@
               },
           ],
           msRunModalTableData:[],
-          sampleCol:[],
-          sampleColQueryState:false,
-          sampleData:[],
           dropdownOptions:[],
           experimentType:'',
           sampleNumber:0,
@@ -346,15 +343,9 @@
               item.value="";
               item.icon="";
           },
-          showModal(){
+          showAddColModal(){
             this.newColumnNameSelectedArray=[];
             this.addColumnBool=true;
-          },
-          showCopyModal(item,col,row){
-            this.pasteIndex = {item,row,col};
-            this.copyValue='';
-            this.copyArray=[];
-            this.copyModalBool=true;
           },
           addCol(){
               let keyArray = [];
@@ -385,6 +376,59 @@
                       })
                   }
               }
+          },
+          deleteCol(itemCol, index){
+            console.log('delete',itemCol,index);
+            this.sampleCol.splice(index,1);
+            let key = itemCol.key;
+            for(let i=0; i<this.sampleData.length; i++){
+                for(let j in this.sampleData[i]){
+                    if(j == key){
+                      delete this.sampleData[i][key]
+                      break;
+                    }
+                }
+            }
+          },
+          addRow(){
+            let item={};
+            for(let i=0;i<this.sampleCol.length;i++){
+                item[this.sampleCol[i].key] = {
+                    value:'',
+                    dropdown:false,
+                    accession:'null',
+                    accessionKey:this.accessionKey,
+                    cvLabel:'null',
+                    col:this.sampleCol[i],
+                    icon:'',
+                    checked:true,
+                } 
+            }
+            item.accession={
+                value:"PXD_S"+(this.sampleData.length+1),
+                dropdown:false,
+                accession:'null',
+                accessionKey:this.accessionKey++,
+                cvLabel:'null',
+                col:this.sampleCol[0],
+                icon:'',
+                checked:true,
+            }
+            //console.log('this.sampleCol.length+1',this.sampleData.length+1);
+            this.sampleData.push(item);
+          },    
+          deleteRow(itemRow, index){
+              this.sampleData.splice(index,1);
+              // //update row index
+              // for(let i=0; i<this.sampleData.length; i++){
+              //   this.sampleData[i].accession.value = "PXD_S"+(i+1);
+              // }
+          },
+          showCopyModal(item,col,row){
+            this.pasteIndex = {item,row,col};
+            this.copyValue='';
+            this.copyArray=[];
+            this.copyModalBool=true;
           },
           copy(){
             document.querySelector('#text-to-copy textarea').select();
@@ -460,53 +504,7 @@
               //if(!stat)
                 //this.$refs.addPropertyTable.selectAll(false);
           },
-          addRow(){
-            let item={};
-            for(let i=0;i<this.sampleCol.length;i++){
-                item[this.sampleCol[i].key] = {
-                    value:'',
-                    dropdown:false,
-                    accession:'null',
-                    accessionKey:this.accessionKey,
-                    cvLabel:'null',
-                    col:this.sampleCol[i],
-                    icon:'',
-                    checked:true,
-                } 
-            }
-            item.accession={
-                value:"PXD_S"+(this.sampleData.length+1),
-                dropdown:false,
-                accession:'null',
-                accessionKey:this.accessionKey++,
-                cvLabel:'null',
-                col:this.sampleCol[0],
-                icon:'',
-                checked:true,
-            }
-            //console.log('this.sampleCol.length+1',this.sampleData.length+1);
-            this.sampleData.push(item);
-          },
-          deleteCol(itemCol, index){
-            console.log('delete',itemCol,index);
-            this.sampleCol.splice(index,1);
-            let key = itemCol.key;
-            for(let i=0; i<this.sampleData.length; i++){
-                for(let j in this.sampleData[i]){
-                    if(j == key){
-                      delete this.sampleData[i][key]
-                      break;
-                    }
-                }
-            }
-          },
-          deleteRow(itemRow, index){
-              this.sampleData.splice(index,1);
-              // //update row index
-              // for(let i=0; i<this.sampleData.length; i++){
-              //   this.sampleData[i].accession.value = "PXD_S"+(i+1);
-              // }
-          },
+          
           dropdownClick(e,item){
             item.dropdown=false;
             if(e == "nodata" && !item.value){
@@ -617,7 +615,7 @@
               setTimeout(()=>{
                 this.$emit('update', this.sampleData)
               },50)
-          }
+          },
           deep:true
         }
     },
@@ -630,7 +628,8 @@
       // },
     },
     mounted: function(){
-
+      console.log(this.data)
+      console.log(this.sampleData)
     },
     created(){
       this.$bus.$on('annotation-confirm', this.confirm);
@@ -954,6 +953,5 @@
     .card.annotation .card-content{
       overflow: auto;
       display: flex;
-      height: 500px;
     }
 </style>
