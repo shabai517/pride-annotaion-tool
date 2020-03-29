@@ -10,12 +10,12 @@
               </div>
           </Row>
           <Row>
-            <selfTable class="sample-class-table" :loading="loading" :columns="sampleCol" :data="sampleData"  @update="update"></selfTable>
+            <selfTable :name="name" :height='tableHeight' :loading="loading" :columns="sampleCol" :data="sampleData"></selfTable>
             <div class="button-wrapper">
                 <div class="search-button">
                     <Button type="primary" @click="back">Back</Button>
                 </div>
-                <div class="search-button right">
+                <div v-if="sampleCol.length>0 && sampleData.length>0" class="search-button right">
                     <Button type="primary" @click="annotationSave">Save</Button>
                     <Button type="primary" @click="annotationConfirm">Confirm</Button>
                 </div>
@@ -34,6 +34,7 @@
     name: 'annotate',
     data(){
       return {
+            name:'Sample Data',
             annotationStep:2,
             stepDes:'Here is used to put the explanation about steps',
             title:'',
@@ -303,9 +304,16 @@
 
     },
     computed:{
-  
+      tableHeight:function(){
+        let minHeight = 300
+        return this.screenHeight - 90*2 - 138 - 20 - 55 - 16*2 > minHeight ? this.screenHeight - 90*2 - 138 - 20 - 55 - 16*2 : minHeight
+      }
     },
     mounted: function(){
+      var that = this
+      window.onresize = function () {
+        that.screenHeight = document.documentElement.clientHeight
+      }
       this.localStorageCheck();
       //this.queryConfig();
       //this.updateCondition();//move into queryConfig function
