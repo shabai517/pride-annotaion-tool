@@ -13,26 +13,32 @@
               </div>
           </Row>
           <Row>
-            <Card>
-                  <p slot="title">Omics SDRF Reader</p>
-                  <div class="table-container">
-                      <Table stripe border ref="selection" :height='tableHeight'  :loading="fileListLoading" :columns="fileListCol" :data="fileList" ></Table>
-                  </div>
-                </Card>
+                <selfTable :name="name" :height='tableHeight' :loading="loading" :columns="sampleCol" :data="sampleData"></selfTable>
+                <div class="button-wrapper">
+                <div class="search-button">
+                    <Button type="primary" @click="back">Back</Button>
+                </div>
+                <div v-if="sampleCol.length>0 && sampleData.length>0" class="search-button right">
+                    <Button type="primary" @click="annotationSave">Save</Button>
+                    <Button type="primary" @click="annotationConfirm">Confirm</Button>
+                </div>
+            </div>
           </Row>
       </div>
   </div>
 </template>
 <script>
   var fs = require("fs");
+  import selfTable from '@/components/table.vue'
   export default {
     name: 'srdf',
     data(){
       return {
-           fileListLoading:false,
-           fileListCol:[
+           name:'Omics SDRF Reader',
+           loading:false,
+           sampleCol:[
            ],
-           fileList:[],
+           sampleData:[],
            keyList:[],
            screenHeight: document.documentElement.clientHeight
       }
@@ -41,7 +47,7 @@
 
     },
     components: {
-
+      selfTable
     },
     methods:{
       readFile(e){
@@ -52,13 +58,13 @@
         let that = this
         let reader = new FileReader();
         reader.readAsText(files[0],'UTF-8');
-        this.fileListLoading=true
+        this.loading=true
         reader.onload = function (e) {
             let arr = this.result.split('\n');
             for(let i in arr){
                 if(i == 0){
                   let header = arr[i].split('\t');
-                  that.fileListCol.push({
+                  that.sampleCol.push({
                       type: 'index',
                       width: 80,
                       align: 'center'
@@ -71,7 +77,7 @@
                         width:300
                       }
                       that.keyList.push(item.key)
-                      that.fileListCol.push(item)
+                      that.sampleCol.push(item)
                   }
                 }
               else{
@@ -80,10 +86,10 @@
                 for(let j in body){
                     item[that.keyList[j]]=body[j]
                 }
-                that.fileList.push(item)
+                that.sampleData.push(item)
               }
             }
-            that.fileListLoading=false
+            that.loading=false
             // for(let i in header)
             // console.log(header)
             //document.getElementById("result").innerHTML += urlData;
@@ -102,13 +108,46 @@
         else
           return 'red'
       },
+      back(){
+        let projectAccession = localStorage.getItem("projectAccession")
+        if(projectAccession){
+            this.$Modal.confirm({
+                title: 'Uncompleted Annotaion',
+                content: '<p>Do you want to delete the uncompleted annotation?</p>',
+                onOk: () => {
+                    localStorage.clear();
+                    this.$router.push({name:'index'});
+                },
+                onCancel: () => {
+                   
+                }
+            });
+        }
+        else
+          this.$router.push({name:'index'});
+      },
+      annotationConfirm(){
+          this.$Modal.confirm({
+              title: 'Finish Annotation',
+              content: '<p>Do you want to submit this annotation?</p>',
+              onOk: () => {
+                  this.$bus.$emit('annotation-confirm');
+              },
+              onCancel: () => {
+                  
+              }
+          });
+      },
+      annotationSave(){
+          this.$bus.$emit('annotation-save');
+      },
     },
     watch: {
 
     },
     computed:{
       tableHeight:function(){
-        let minHeight = 400
+        let minHeight = 300
         return this.screenHeight - 90*2 - 138 - 20 - 55 - 16*2 > minHeight ? this.screenHeight - 90*2 - 138 - 20 - 55 - 16*2 : minHeight
       }
     },
@@ -165,7 +204,19 @@
       color: white;
       text-decoration: none;
   }
-
+  .button-wrapper{
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .search-button.right{
+    display: flex;
+    width: 180px;
+    justify-content: space-between;
+  }
+  .search-button button{
+    width: 85px;
+  }
 </style>
 <style >
 .table-container .ivu-table-header table{
