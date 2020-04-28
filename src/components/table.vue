@@ -12,32 +12,38 @@
               <div v-if="sampleData.length == 0" class="no-data-table-wrapper">
                   <span>No data</span>
               </div>
-              <div v-else>
-                  <div :style="{'padding-top': rowStart*45+'px'}"></div>
+              <template v-else>
+                  <!-- <div :style="{'padding-top': rowStart*45+'px'}"></div> -->
                   <div class="table-col" v-for="(itemCol,i) in sampleCol" :key="itemCol.key">
-                      <div class="table-row first handle"><Icon v-if="itemCol.key!='accession'" class="icon-in-th-left" type="ios-remove-circle-outline" @click="removeAll(itemCol.key,'sampledata')" size="14"></Icon>{{itemCol.name}}<Icon class="icon-in-th-right" type="ios-remove-circle-outline" v-if="!itemCol.required" @click="deleteCol(itemCol,i)" size="14"></Icon></div>
-                      <div class="table-row" v-for="(itemRow,j) in sampleData.slice(rowStart,rowEnd)">
-                            <div v-if="itemCol.key!='accession'">
-                                  <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-change="getAutoCompleteList(itemCol,itemRow)" @on-focus="focus($event,itemCol,itemRow,'sampledata',j)" @on-blur="inputBlur(itemRow[itemCol.key])">
+                      <div class="table-row first"><Icon class="icon-in-th-left" type="ios-remove-circle-outline" @click="removeAll(itemCol.key,'sampledata')" size="14"></Icon>{{itemCol.name}}<Icon class="icon-in-th-right" type="ios-remove-circle-outline" @click="deleteCol(itemCol,i)" size="14"></Icon></div>
+                      <!-- <div class="table-row" v-for="(itemRow,j) in sampleData.slice(rowStart,rowEnd)"> -->
+                      <div class="table-row" v-for="(itemRow,j) in sampleData">
+                            <div v-if="itemCol.key!='index'">
+                                  <Input :class="{inputError:!itemRow.checked}" size="small" type="text" v-model="itemRow[itemCol.key]" :icon="itemRow[itemCol.key] ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-change="getAutoCompleteList(itemCol,itemRow)" @on-focus="focus($event,itemCol,itemRow,'sampledata',j)" @on-blur="inputBlur(itemRow[itemCol.key])">
                                   </Input>
+                                  <div class="copy-icon"><Icon @click="showCopyModal(itemRow[itemCol.key],itemCol.key,j)" type="ios-copy-outline" size="16"></Icon></div>
                             </div>
                             <div v-else>
-                                <div class="accession-col">
-                                    <Icon v-if="sampleData.length>1 && j == sampleData.length-1" class="icon-in-row" type="ios-remove-circle-outline" @click="deleteRow(itemRow,j)" size="14"></Icon>
-                                    <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-change="getAutoCompleteList(itemCol,itemRow)" @on-blur="inputBlur(itemRow[itemCol.key])">
-                                    </Input>
+                                <div class="index-col">
+                                    <!-- <Icon v-if="sampleData.length>1 && j == sampleData.length-1" class="icon-in-row" type="ios-remove-circle-outline" @click="deleteRow(itemRow,j)" size="14"></Icon> -->
+                                    <Icon v-if="sampleData.length>1" class="icon-in-row" type="ios-remove-circle-outline" @click="deleteRow(itemRow,j)" size="14"></Icon>
+                                    <div>
+                                      {{itemRow.index}}
+                                    </div>
+                                    <!-- <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-change="getAutoCompleteList(itemCol,itemRow)" @on-blur="inputBlur(itemRow[itemCol.key])">
+                                    </Input> -->
                                     <!-- <span>{{itemRow.accession}}</span> -->
                                 </div>
                             </div>
-                            <div class="copy-icon"><Icon @click="showCopyModal(itemRow[itemCol.key],itemCol.key,j)" type="ios-copy-outline" size="16"></Icon></div>
+                            
                       </div>
                   </div>
-                  <div :style="{'padding-top': (sampleData.length-rowEnd)*45+'px'}"></div>
+                  <!-- <div :style="{'padding-top': (sampleData.length-rowEnd)*45+'px'}"></div> -->
                   <div class="sample-table-extra add-row-icon">
                     <!--  <Icon class="add-row-icon" type="plus-round" @click="addRow" size="20"></Icon><span>Add Sample</span> -->
                   </div>
-                  <div :style="{'padding-top': rowStart*30+'px'}"></div>
-              </div>
+                  <!-- <div :style="{'padding-top': rowStart*30+'px'}"></div> -->
+              </template>
           </div>
           <Dropdown class="dropdown-remote" :style="{left:dropdown.left + 'px', top:dropdown.top + 'px'}" trigger="custom" :visible="dropdown.visible" placement="bottom-end" @on-click="dropdownClick($event,dropdown.row[dropdown.col.key])">
               <DropdownMenu slot="list">
@@ -49,7 +55,7 @@
                   </DropdownItem>
               </DropdownMenu>
           </Dropdown>
-          <Spin class="table-spin" v-if="tableLoading"></Spin>  
+          <Spin class="table-spin" v-if="loading"></Spin>  
       </Card>
       <Modal
           title="Add Column"
@@ -97,6 +103,7 @@
           sampleCol: cloneDeep(this.columns),
           tokenApi:this.$store.state.baseApiURL + '/getAAPToken', 
           updateSampleApi:this.$store.state.baseApiURL + '/annotator/'+this.$route.params.id+'/updateSampleMsRuns',
+          getTableDataAPI:this.$store.state.baseApiURL + '/properties/getPropertiesFromText',
           visible:true,
           addColumnBool:false,
           drawerShowBool:false,
@@ -593,31 +600,47 @@
           //   console.log(this.rowStart,this.rowEnd);
           // }
           scroll(e){
-            console.log('e',e)
-            let scrollTop = e.target.scrollTop
-            let scrollHeight = e.target.scrollHeight
-            let clientHeight = e.target.clientHeight
-            console.log('e',e)
-            console.log('scrollTop',scrollTop)
-            console.log('scrollHeight',scrollHeight)
-            console.log('clientHeight',clientHeight)
-            let offset = (scrollTop + clientHeight) / scrollHeight
-            let start = Math.max(Math.ceil(offset * this.sampleData.length) - 50, 0)
-            this.rowStart = Math.min(start, this.sampleData.length - 75)
-            this.rowEnd = this.rowStart + 75
-            console.log(this.rowStart,this.rowEnd)
+            // console.log('e',e)
+            // let scrollTop = e.target.scrollTop
+            // let scrollHeight = e.target.scrollHeight
+            // let clientHeight = e.target.clientHeight
+            // console.log('e',e)
+            // console.log('scrollTop',scrollTop)
+            // console.log('scrollHeight',scrollHeight)
+            // console.log('clientHeight',clientHeight)
+            // let offset = (scrollTop + clientHeight) / scrollHeight
+            // let start = Math.max(Math.ceil(offset * this.sampleData.length) - 50, 0)
+            // this.rowStart = Math.min(start, this.sampleData.length - 75)
+            // this.rowEnd = this.rowStart + 75
+            // console.log(this.rowStart,this.rowEnd)
           }
     },
     watch: {
         sampleData:{
           handler(){
-            if(this.sampleData.length>0 || this.msRunArray.length>0)
-              setTimeout(()=>{
-                this.$emit('update', this.sampleData)
-              },50)
+            if(this.sampleData.length>0 || this.msRunArray.length>0){
+                setTimeout(()=>{
+                  this.$emit('update', this.sampleData)
+                },50)
+            }
+              
           },
           deep:true
-        }
+        },
+        sampleCol:{
+          handler(){
+            console.log('sampleCol',this.sampleCol)
+          },
+          deep:true
+        },
+        data(oldValue, newValue){
+            this.sampleData = cloneDeep(newValue)
+            console.log('this.sampleData',this.sampleData)
+        },
+        columns(oldValue, newValue){
+            this.sampleCol = cloneDeep(newValue)
+            console.log('this.sampleCol',this.sampleCol)
+        },
     },
     computed:{
       // listSample: function(){
@@ -628,8 +651,9 @@
       // },
     },
     mounted: function(){
-      console.log(this.data)
-      console.log(this.sampleData)
+      
+      // console.log(this.data)
+      // console.log(this.sampleData)
     },
     created(){
       this.$bus.$on('annotation-confirm', this.confirm);
@@ -655,16 +679,24 @@
   .table-col:first-child{
       border-left: 1px solid #e9eaec;
   }
+  .table-col:first-child .table-row.first{
+      padding: 10px;
+  }
+  .table-col:first-child .table-row.first:hover i{
+    display: none
+  }
   .table-col{
       flex:1;
-      min-width: 200px;
+      /*min-width: 200px;*/
+      width: auto;
+      max-width: 300px;
       border-right: 1px solid #e9eaec;
   }
    .table-col:last-child{
       min-width: 350px;
   }
   .table-row:first-child{
-      min-width: 100px;
+      min-width: 50px;
       border-top: 1px solid #e9eaec;
       background-color: #f8f8f9;
       align-items: center;
@@ -681,13 +713,20 @@
   }
   .table-row{
       border-bottom: 1px solid #e9eaec;
-      padding: 10px 20px 10px 5px;
+      /*padding: 10px 20px 10px 5px;*/
+      padding: 10px 5px;
       position: relative;
       height:45px;
   }
   .table-row.first{
-    cursor: all-scroll;
-    padding:10px 20px;
+    /*cursor: all-scroll;*/
+    padding:10px 30px;
+  }
+  .table-row.first i{
+    display: none
+  }
+  .table-row.first:hover i{
+    display: inline-block
   }
   .table-row .copy-icon{
     position: absolute;
@@ -718,12 +757,20 @@
   .add-col-table{
     /*height: 500px;*/
   }
-  .accession-col{
-    text-align: center;
+  .index-col{
     position: relative;
-    min-width: 80px;
     display: flex;
     align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+  }
+  .index-col i{
+    display: none;
+    position: absolute;
+    left: 0;
+  }
+  .index-col:hover i{
+    display: inline-block;
   }
   .card{
     margin-bottom: 20px;

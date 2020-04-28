@@ -12,6 +12,14 @@
                 </a>
               </div>
           </Row>
+          <!-- <Row>
+              <Card>
+                <p slot="title">Omics SDRF Reader</p>
+                <div class="table-container">
+                    <Table stripe border ref="selection" :height='tableHeight'  :loading="fileListLoading" :columns="fileListCol" :data="fileList" ></Table>
+                </div>
+              </Card>
+          </Row>  -->
           <Row>
                 <selfTable :name="name" :height='tableHeight' :loading="loading" :columns="sampleCol" :data="sampleData"></selfTable>
                 <div class="button-wrapper">
@@ -36,11 +44,10 @@
       return {
            name:'Omics SDRF Reader',
            loading:false,
-           sampleCol:[
-           ],
+           sampleCol:[],
            sampleData:[],
            keyList:[],
-           screenHeight: document.documentElement.clientHeight
+           screenHeight: document.documentElement.clientHeight,
       }
     },
     beforeRouteUpdate:function (to, from, next) {
@@ -50,55 +57,51 @@
       selfTable
     },
     methods:{
-      readFile(e){
-        var files = e.target.files || e.dataTransfer.files;
+      readFile(file){
+        var files = file.target.files || file.dataTransfer.files;
         if (!files.length)
           return;
 
-        let that = this
         let reader = new FileReader();
         reader.readAsText(files[0],'UTF-8');
         this.loading=true
-        reader.onload = function (e) {
-            let arr = this.result.split('\n');
+        reader.onload =  (e)=> {
+            let arr = e.currentTarget.result.split('\n');
             for(let i in arr){
-                if(i == 0){
+                if(i == 0){ //for first row which is the col in the table
                   let header = arr[i].split('\t');
-                  that.sampleCol.push({
-                      type: 'index',
-                      width: 80,
-                      align: 'center'
+                  this.sampleCol.push({
+                      name: '#',
+                      key: 'index',
+                      align: 'center',
+                      required: true,
                   })
                   for(let j in header){
                       let item = {
-                        title:header[j],
-                        key:header[j].replace(/\s+/g,""),
-                        className:that.setClassName(header[j].replace(/\s+/g,"")),
-                        width:300
+                        name:header[j],
+                        key:header[j].replace(/\s+/g,"") + Math.floor(100000 + Math.random() * 900000),
+                        className:this.setClassName(header[j].replace(/\s+/g,"")),
+                        required: false,
                       }
-                      that.keyList.push(item.key)
-                      that.sampleCol.push(item)
+                      this.keyList.push(item.key)
+                      this.sampleCol.push(item)
                   }
                 }
-              else{
-                let body = arr[i].split('\t');
-                let item = {}
-                for(let j in body){
-                    item[that.keyList[j]]=body[j]
+                else{ //for the table data
+                  let body = arr[i].split('\t');
+                  let item = {}
+                  for(let j in body){
+                      item.index=i
+                      item[this.keyList[j]]=body[j]
+                      item.checked=true
+                  }
+                  this.sampleData.push(item)
                 }
-                that.sampleData.push(item)
-              }
             }
-            that.loading=false
-            // for(let i in header)
-            // console.log(header)
-            //document.getElementById("result").innerHTML += urlData;
+            this.loading=false
+            //console.log(this.sampleCol,this.sampleData)
+            //this.$forceUpdate()
         };
-
-          // var inputElement = document.getElementById("file");
-          // inputElement.addEventListener("change", (e)=>{
-          //   console.log(e)
-          // }, false);
       },
       setClassName(name){
         if(name.match('sourcename') || name.match('characteristics'))
@@ -141,6 +144,27 @@
       annotationSave(){
           this.$bus.$emit('annotation-save');
       },
+      getTableData(){
+          console.log('getTableData sampleCol',this.sampleCol)
+          let query = {
+            sdrf_properties:'characteristics[organism], characteristics[organism part]',
+
+          }
+          this.$http
+              .get(this.getTableDataAPI,{params: query})
+              .then(function(res){
+                 console.log(res.body)
+                
+                  // if(res.body._embedded && res.body._embedded.files){
+                   
+                  // }
+                  // else{
+                  //     this.$Message.error({content:'No Files', duration:1});
+                  // }
+              },function(err){
+                  this.fileListLoading = false;
+              });
+      },
     },
     watch: {
 
@@ -152,9 +176,8 @@
       }
     },
     mounted: function(){
-        var that = this
-        window.onresize = function () {
-          that.screenHeight = document.documentElement.clientHeight
+        window.onresize = () => {
+          this.screenHeight = document.documentElement.clientHeight
         }
     },
     created(){
