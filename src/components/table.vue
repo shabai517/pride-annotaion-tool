@@ -15,18 +15,24 @@
               <template v-else>
                   <!-- <div :style="{'padding-top': rowStart*45+'px'}"></div> -->
                   <div class="table-col" v-for="(itemCol,i) in sampleCol" :key="itemCol.key">
-                      <div class="table-row first"><Icon class="icon-in-th-left" type="ios-remove-circle-outline" @click="removeAll(itemCol.key,'sampledata')" size="14"></Icon>{{itemCol.name}}<Icon class="icon-in-th-right" type="ios-remove-circle-outline" @click="deleteCol(itemCol,i)" size="14"></Icon></div>
+                      <div class="table-row first">
+                        <Icon class="icon-in-th-left" type="ios-remove-circle-outline" @click="removeAll(itemCol.key,'sampledata')" size="14"></Icon>
+                        {{itemCol.name}}
+                        <Icon class="icon-in-th-right" type="ios-close-circle-outline" @click="deleteCol(itemCol,i)" size="14"></Icon>
+                        <Icon style="position: absolute; top: 0px; right: 0px" class="icon-in-th-right" type="ios-add-circle-outline" size="6" @click="showAddColModal"></Icon>
+                      </div>
                       <!-- <div class="table-row" v-for="(itemRow,j) in sampleData.slice(rowStart,rowEnd)"> -->
-                      <div class="table-row" v-for="(itemRow,j) in sampleData">
-                            <div v-if="itemCol.key!='index'">
-                                  <Input :class="{inputError:!itemRow.checked}" size="small" type="text" v-model="itemRow[itemCol.key]" :icon="itemRow[itemCol.key] ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-change="getAutoCompleteList(itemCol,itemRow)" @on-focus="focus($event,itemCol,itemRow,'sampledata',j)" @on-blur="inputBlur(itemRow[itemCol.key])">
+                      <div class="table-row" :class="{'index':itemCol.key=='index'}" v-for="(itemRow,j) in sampleData">
+                            <template v-if="itemCol.key!='index'">
+                                  <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key].value)" @on-change="getAutoCompleteList(itemCol,itemRow)" @on-focus="focus($event,itemCol,itemRow,j)" @on-blur="inputBlur(itemRow[itemCol.key])">
                                   </Input>
                                   <div class="copy-icon"><Icon @click="showCopyModal(itemRow[itemCol.key],itemCol.key,j)" type="ios-copy-outline" size="16"></Icon></div>
-                            </div>
-                            <div v-else>
+                            </template>
+                            <template v-else>
+                                <Icon v-if="sampleData.length>1" class="icon-in-row" type="ios-remove-circle-outline" @click="deleteRow(itemRow,j)" size="14"></Icon>
+                                <Icon style="position: absolute; bottom: 0px; left: 0px" class="icon-in-row" type="ios-add-circle-outline" size="6" @click="addRow(j)"></Icon>
                                 <div class="index-col">
                                     <!-- <Icon v-if="sampleData.length>1 && j == sampleData.length-1" class="icon-in-row" type="ios-remove-circle-outline" @click="deleteRow(itemRow,j)" size="14"></Icon> -->
-                                    <Icon v-if="sampleData.length>1" class="icon-in-row" type="ios-remove-circle-outline" @click="deleteRow(itemRow,j)" size="14"></Icon>
                                     <div>
                                       {{itemRow.index}}
                                     </div>
@@ -34,7 +40,7 @@
                                     </Input> -->
                                     <!-- <span>{{itemRow.accession}}</span> -->
                                 </div>
-                            </div>
+                            </template>
                             
                       </div>
                   </div>
@@ -55,7 +61,7 @@
                   </DropdownItem>
               </DropdownMenu>
           </Dropdown>
-          <Spin class="table-spin" v-if="loading"></Spin>  
+          <Spin class="table-spin" v-if="tableLoadingTemp"></Spin>  
       </Card>
       <Modal
           title="Add Column"
@@ -103,7 +109,6 @@
           sampleCol: cloneDeep(this.columns),
           tokenApi:this.$store.state.baseApiURL + '/getAAPToken', 
           updateSampleApi:this.$store.state.baseApiURL + '/annotator/'+this.$route.params.id+'/updateSampleMsRuns',
-          getTableDataAPI:this.$store.state.baseApiURL + '/properties/getPropertiesFromText',
           visible:true,
           addColumnBool:false,
           drawerShowBool:false,
@@ -275,9 +280,11 @@
                           return;
                         if(!itemRow[itemCol.key].active)
                           return;
+
+                        this.dropdown.visible = true
                         if(res.body.length>0 || searchValue){
                           //itemRow[itemCol.key].dropdown=true;
-                          this.dropdown.visible = true
+                          // this.dropdown.visible = true
                         }
 
                         this.dropdownOptions=res.body;
@@ -286,7 +293,9 @@
                         }
                     }
                     catch(e){
-                        console.log(e.message)
+                         //this.dropdown.visible = true
+                        this.$Message.error({content:'Auto Comeplete Error', duration:2});
+                        console.log(e)
                     }
               }, 500);
               this.$forceUpdate();
@@ -300,7 +309,7 @@
             str=str.join(" ");
             return str;
           },
-          focus(e,itemCol,itemRow,type,index){
+          focus(e,itemCol,itemRow,index){
               let left = e.target.parentNode.parentNode.parentNode.offsetLeft-document.querySelector('.card-content').scrollLeft;
               let top = e.target.parentNode.parentNode.parentNode.offsetTop;
 
@@ -309,13 +318,12 @@
               this.dropdown.focus = itemCol.key+index
               this.dropdown.visible = false
               this.dropdown.index = index
-              this.dropdown.type = type
               this.dropdown.col = itemCol
               this.dropdown.row = itemRow
               this.dropdown.top = top
               this.dropdown.left =left
 
-              console.log(this.dropdown);
+              console.log('focus',this.dropdown);
               if(!itemRow[itemCol.key].value)
                 return;
               this.getAutoCompleteList(itemCol,itemRow);
@@ -385,51 +393,67 @@
               }
           },
           deleteCol(itemCol, index){
-            console.log('delete',itemCol,index);
-            this.sampleCol.splice(index,1);
-            let key = itemCol.key;
-            for(let i=0; i<this.sampleData.length; i++){
-                for(let j in this.sampleData[i]){
-                    if(j == key){
-                      delete this.sampleData[i][key]
-                      break;
+            this.$Modal.confirm({
+                title: 'Delete Column',
+                content: '<p>Are you sure to remove this column?</p>',
+                onOk: () => {
+                    this.tableLoading = true
+                    this.sampleCol.splice(index,1);
+                    let key = itemCol.key;
+                    for(let i=0; i<this.sampleData.length; i++){
+                        for(let j in this.sampleData[i]){
+                            if(j == key){
+                              delete this.sampleData[i][key]
+                              break;
+                            }
+                        }
                     }
+                    setTimeout(()=>{
+                      this.tableLoading = false
+                    },200)
+                },
+                onCancel: () => {
+                    
                 }
-            }
+            });
           },
-          addRow(){
+          addRow(index){
+            this.tableLoading = true
             let item={};
             for(let i=0;i<this.sampleCol.length;i++){
                 item[this.sampleCol[i].key] = {
                     value:'',
-                    dropdown:false,
-                    accession:'null',
-                    accessionKey:this.accessionKey,
-                    cvLabel:'null',
-                    col:this.sampleCol[i],
-                    icon:'',
                     checked:true,
+                    active:false,
                 } 
             }
-            item.accession={
-                value:"PXD_S"+(this.sampleData.length+1),
-                dropdown:false,
-                accession:'null',
-                accessionKey:this.accessionKey++,
-                cvLabel:'null',
-                col:this.sampleCol[0],
-                icon:'',
-                checked:true,
+            item.index=index
+            this.sampleData.splice(index+1, 0, item);
+            for(let i=0; i<this.sampleData.length; i++){
+              this.sampleData[i].index = i+1
             }
-            //console.log('this.sampleCol.length+1',this.sampleData.length+1);
-            this.sampleData.push(item);
+            setTimeout(()=>{
+              this.tableLoading = false
+            },200)
           },    
           deleteRow(itemRow, index){
-              this.sampleData.splice(index,1);
-              // //update row index
-              // for(let i=0; i<this.sampleData.length; i++){
-              //   this.sampleData[i].accession.value = "PXD_S"+(i+1);
-              // }
+              this.$Modal.confirm({
+                  title: 'Delete Row',
+                  content: '<p>Are you sure to remove this row?</p>',
+                  onOk: () => {
+                      this.tableLoading = true
+                      this.sampleData.splice(index,1);
+                      for(let i=0; i<this.sampleData.length; i++){
+                        this.sampleData[i].index = i+1
+                      }
+                      setTimeout(()=>{
+                        this.tableLoading = false
+                      },200)
+                  },
+                  onCancel: () => {
+                      
+                  }
+              });
           },
           showCopyModal(item,col,row){
             this.pasteIndex = {item,row,col};
@@ -629,26 +653,23 @@
         },
         sampleCol:{
           handler(){
-            console.log('sampleCol',this.sampleCol)
+            //console.log('sampleCol',this.sampleCol)
           },
           deep:true
         },
         data(oldValue, newValue){
             this.sampleData = cloneDeep(newValue)
-            console.log('this.sampleData',this.sampleData)
+            //console.log('this.sampleData',this.sampleData)
         },
         columns(oldValue, newValue){
             this.sampleCol = cloneDeep(newValue)
-            console.log('this.sampleCol',this.sampleCol)
+            //console.log('this.sampleCol',this.sampleCol)
         },
     },
     computed:{
-      // listSample: function(){
-      //   return this.sampleData.slice(this.start, this.end)
-      // },
-      // listMsRun: function(){
-      //   return this.sampleData.slice(this.start, this.end)
-      // },
+      tableLoadingTemp: function(){
+        return (this.loading || this.tableLoading)
+      },
     },
     mounted: function(){
       
@@ -712,9 +733,12 @@
       background-color: #2d8cf0ba;
   }
   .table-row{
+      display: flex;
+      justify-content: center;
+      align-items: center;
       border-bottom: 1px solid #e9eaec;
-      /*padding: 10px 20px 10px 5px;*/
-      padding: 10px 5px;
+      padding: 10px 20px 10px 5px;
+      /*padding: 10px 5px;*/
       position: relative;
       height:45px;
   }
@@ -728,6 +752,9 @@
   .table-row.first:hover i{
     display: inline-block
   }
+  .table-row.first i:hover{
+    opacity: 0.6
+  }
   .table-row .copy-icon{
     position: absolute;
     right: 5px;
@@ -738,6 +765,9 @@
   .table-row:hover .copy-icon{
     display: block;
   }
+  .table-row .copy-icon:hover{
+    opacity: 0.6
+  }
   .icon-in-th-right{
     position: absolute;
     right: 10px;
@@ -745,14 +775,14 @@
   }
   .icon-in-th-left{
     position: absolute;
-    left: 3px;
+    left: 10px;
     cursor: pointer;
   }
   .icon-in-row{
     /*position: absolute;
     left: 10px;*/
     cursor: default;
-    margin-right: 5px;
+    /*margin-right: 5px;*/
   }
   .add-col-table{
     /*height: 500px;*/
@@ -762,15 +792,22 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 5px;
+    margin: 0 15px;
   }
-  .index-col i{
+  .table-row.index{
+    padding: 10px 5px;
+  }
+  .table-row.index i{
+    cursor: pointer;
     display: none;
     position: absolute;
-    left: 0;
+    left: 5px;
   }
-  .index-col:hover i{
+  .table-row.index:hover i{
     display: inline-block;
+  }
+  .table-row.index i:hover{
+    opacity: 0.6
   }
   .card{
     margin-bottom: 20px;
@@ -947,6 +984,9 @@
     }
     .inputError .ivu-input{
         border: 1px solid red !important;
+    }
+    .table-row{
+      position: relative;
     }
     .table-row input{
         background-color:white;
