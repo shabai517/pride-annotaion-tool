@@ -48,6 +48,7 @@
            sampleData:[],
            keyList:[],
            screenHeight: document.documentElement.clientHeight,
+           getTableDataAPI:this.$store.state.baseApiURL + '/properties/getPropertiesFromText',
       }
     },
     beforeRouteUpdate:function (to, from, next) {
@@ -65,7 +66,7 @@
         let reader = new FileReader();
         reader.readAsText(files[0],'UTF-8');
         this.loading=true
-        reader.onload =  (e)=> {
+        reader.onload =  async (e)=> {
             let arr = e.currentTarget.result.split('\n');
             for(let i in arr){
                 if(i == 0){ //for first row which is the col in the table
@@ -76,12 +77,26 @@
                       align: 'center',
                       required: true,
                   })
+                  // let properties = ''
+                  // for(let j in header){
+                  //     if(header[j].match(/\[/))
+                  //       properties+=(header[j]+', ')
+                  // }
+                  // let sdrf_properties = properties.slice(0,properties.length-2)
+                  // let query = {
+                  //     sdrf_properties:sdrf_properties,
+                  //     // sdrf_properties:'Characteristics[organism], Characteristics[organism part], Characteristics[age], Characteristics[developmental stage], Characteristics[sex], Characteristics[disease], Characteristics[individual], comment[fraction identifier], comment[file uri], comment[instrument], comment[label], comment[cleavage agent details], comment[modification parameters], comment[modification parameters], comment[precursor mass tolerance], comment[fragment mass tolerance], comment[data file]',
+                  //   }
+                  // let results = await this.$http.get(this.getTableDataAPI,{params: query})
+                  // console.log('results',results)
                   for(let j in header){
                       let item = {
                         name:header[j],
                         key:header[j].replace(/\s+/g,"") + Math.floor(100000 + Math.random() * 900000),
                         className:this.setClassName(header[j].replace(/\s+/g,"")),
                         required: false,
+                        searchable : true,
+
                       }
                       this.keyList.push(item.key)
                       this.sampleCol.push(item)
@@ -91,13 +106,17 @@
                   let body = arr[i].split('\t');
                   let item = {}
                   for(let j in body){
-                      item.index=i
-                      item[this.keyList[j]]=body[j]
-                      item.checked=true
+                      item.index=parseInt(i)
+                      item[this.keyList[j]]={
+                        value:body[j],
+                        checked:true,
+                        active:false,
+                      }
                   }
                   this.sampleData.push(item)
                 }
             }
+            console.log('this.sampleData',this.sampleData)
             this.loading=false
             //console.log(this.sampleCol,this.sampleData)
             //this.$forceUpdate()
