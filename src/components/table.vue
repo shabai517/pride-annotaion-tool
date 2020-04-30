@@ -16,7 +16,7 @@
                   <!-- <div :style="{'padding-top': rowStart*45+'px'}"></div> -->
                   <div class="table-col" v-for="(itemCol,i) in sampleCol" :key="itemCol.key">
                       <div class="table-row first">
-                        <Icon class="icon-in-th-left" type="ios-remove-circle-outline" @click="removeAll(itemCol.key,'sampledata')" size="14"></Icon>
+                        <Icon class="icon-in-th-left" type="ios-remove-circle-outline" @click="removeAll(itemCol.key)" size="14"></Icon>
                         {{itemCol.name}}
                         <Icon class="icon-in-th-right" type="ios-close-circle-outline" @click="deleteCol(itemCol,i)" size="14"></Icon>
                         <Icon style="position: absolute; top: 0px; right: 0px" class="icon-in-th-right" type="ios-add-circle-outline" size="6" @click="showAddColModal"></Icon>
@@ -572,15 +572,26 @@
                   this.blur(itemRow[itemCol.key]);
               });
           },
-          removeAll(key,type){
-              //this.tableLoading=true;
-              console.log('remove all',key,type);
-              if(type == 'sampledata')
-                for(let i=0;i<this.sampleData.length; i++){
-                    this.sampleData[i][key].value = '';
-                    if(this.sampleData[i][key].col.required)
-                        this.sampleData[i][key].checked = false;
-                }
+          removeAll(key){
+              this.$Modal.confirm({
+                  title: 'Remove All',
+                  content: '<p>Are you sure to remove all the content of this column?</p>',
+                  onOk: () => {
+                      this.tableLoading = true
+                      for(let i=0;i<this.sampleData.length; i++){
+                          this.sampleData[i][key].value = '';
+                          //TODO: the following code needed when col is confirmed
+                          // if(this.sampleData[i][key].col.required)
+                          //     this.sampleData[i][key].checked = false;
+                      }
+                      setTimeout(()=>{
+                        this.tableLoading = false
+                      },200)
+                  },
+                  onCancel: () => {
+                      
+                  }
+              });
           },
           localStorageItemAdd(key,data){
               localStorage.setItem(key,data);
