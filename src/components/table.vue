@@ -4,10 +4,10 @@
           <p slot="title" class="resource-list-title-container">
             <span>{{name}}</span>
           </p>
-          <p v-if="sampleData.length>0 && sampleCol.length>0" slot="extra" class="sample-table-extra">
+          <!-- <p v-if="sampleData.length>0 && sampleCol.length>0" slot="extra" class="sample-table-extra">
             <a @click="showAddColModal"><span>Add Col</span><Icon type="ios-add" size="20"></Icon></a>
             <a @click="addRow"><span>Add Row</span><Icon class="add-row-icon" type="ios-add" size="20"></Icon></a>
-          </p>
+          </p> -->
           <div class="card-content" @scroll="scroll" :style="{height:height + 'px'}">
               <div v-if="sampleData.length == 0" class="no-data-table-wrapper">
                   <span>No data</span>
@@ -19,7 +19,7 @@
                         <Icon class="icon-in-th-left" type="ios-remove-circle-outline" @click="removeAll(itemCol.key)" size="14"></Icon>
                         {{itemCol.name}}
                         <Icon class="icon-in-th-right" type="ios-close-circle-outline" @click="deleteCol(itemCol,i)" size="14"></Icon>
-                        <Icon style="position: absolute; top: 0px; right: 0px" class="icon-in-th-right" type="ios-add-circle-outline" size="6" @click="showAddColModal"></Icon>
+                        <Icon style="position: absolute; top: 0px; right: 0px" class="icon-in-th-right" type="ios-add-circle-outline" size="6" @click="showAddColModal(i)"></Icon>
                       </div>
                       <!-- <div class="table-row" v-for="(itemRow,j) in sampleData.slice(rowStart,rowEnd)"> -->
                       <div class="table-row" :class="{'index':itemCol.key=='index'}" v-for="(itemRow,j) in sampleData">
@@ -65,11 +65,12 @@
       </Card>
       <Modal
           title="Add Column"
+          class-name="addColModal"
           v-model="addColumnBool"
           :closable="false"
           @on-ok="addCol"
           @on-visible-change="modalVisibleChange">
-          <Table border ref="addPropertyTable" class="add-col-table" :columns="newCol" :data="sampleCol" @on-selection-change="newColSelectChange"></Table>
+          <Table border ref="addPropertyTable" class="add-col-table" :columns="newCol" :data="addedColData" @on-selection-change="newColSelectChange"></Table>
       </Modal>
       <Modal
           title="Copy"
@@ -102,11 +103,12 @@
   import store from "@/store.js"
   export default {
     name: 'archive',
-    props: ['columns','data','loading','height','name'],
+    props: ['columns','data','addedCol','loading','height','name'],
     data(){
       return {
           sampleData: cloneDeep(this.data),
           sampleCol: cloneDeep(this.columns),
+          addedColData: cloneDeep(this.addedCol),
           tokenApi:this.$store.state.baseApiURL + '/getAAPToken', 
           updateSampleApi:this.$store.state.baseApiURL + '/annotator/'+this.$route.params.id+'/updateSampleMsRuns',
           visible:true,
@@ -127,17 +129,17 @@
               },
               {
                   title: '',
-                  key: 'cvLabel',
+                  key: 'key',
                   width:1,
                   render:(h,params)=>{
                     return h('div')
                   },
                   // width:0.1,
-                  className:'new-col-table', 
+                  className:'new-col-table' 
               },
               {
                   title: '',
-                  key: 'accession',
+                  key: 'searchable',
                   width:1,
                   render:(h,params)=>{
                     return h('div')
@@ -155,26 +157,6 @@
                   // width:0.1,
                   className:'new-col-table' 
               },
-              {
-                  title: '',
-                  key: 'orignal_name',
-                  width:1,
-                  render:(h,params)=>{
-                    return h('div')
-                  },
-                  // width:0.1,
-                  className:'new-col-table' 
-              },
-              {
-                  title: '',
-                  key: 'key',
-                  width:1,
-                  render:(h,params)=>{
-                    return h('div')
-                  },
-                  // width:0.1,
-                  className:'new-col-table' 
-              }
           ],
           newData:[],
           msRunModalTableCol:[
@@ -247,6 +229,7 @@
           rowStart:0,
           rowEnd:0,
           tableLoading:false,
+          colIndex:0,
           // start: 0,
           // end: 75
       }
@@ -358,39 +341,30 @@
               item.value="";
               item.icon="";
           },
-          showAddColModal(){
+          showAddColModal(index){
             this.newColumnNameSelectedArray=[];
             this.addColumnBool=true;
+            this.colIndex = index
           },
-          addCol(){
-              let keyArray = [];
+          addCol(){//TODO:这里要继续编
               for(let i=0; i<this.newColumnNameSelectedArray.length; i++){
                   let item = {
-                    experimentType:this.experimentType,
-                    required: false,
-                    cvLabel:this.newColumnNameSelectedArray[i].cvLabel,
-                    accession:this.newColumnNameSelectedArray[i].accession,
-                    name:this.newColumnNameSelectedArray[i].name,
-                    orignal_name:this.newColumnNameSelectedArray[i].orignal_name,
-                    key: this.newColumnNameSelectedArray[i].key + Date.now()
+                    name: this.newColumnNameSelectedArray[i].name,
+                    key: this.newColumnNameSelectedArray[i].key,
+                    required: this.newColumnNameSelectedArray[i].required,
+                    searchable: this.newColumnNameSelectedArray[i].searchable
                   }
-                  keyArray.push(item);
-                  this.sampleCol.push(item);
-              }
-              //console.log('keyArray', keyArray);
-              for(let i=0; i<this.sampleData.length; i++){
-                  for(let j=0; j<keyArray.length; j++){
-                      this.$set(this.sampleData[i], keyArray[j].key,{
+                  this.colIndex++
+                  this.sampleCol.splice(this.colIndex, 0, item);
+                  for(let j=0; j<this.sampleData.length; j++){
+                      this.$set(this.sampleData[j],item.key,{
                           value:'',
-                          dropdown:false,
-                          accession:'null',
-                          cvLabel:'null',
-                          col:keyArray[j],
-                          icon:'',
                           checked:true,
+                          active:false,
                       })
                   }
               }
+              console.log('add col',this.sampleData, this.sampleCol)
           },
           deleteCol(itemCol, index){
             this.$Modal.confirm({
@@ -408,6 +382,7 @@
                             }
                         }
                     }
+                    console.log('delete col', this.sampleData, this.sampleCol)
                     setTimeout(()=>{
                       this.tableLoading = false
                     },200)
@@ -432,6 +407,7 @@
             for(let i=0; i<this.sampleData.length; i++){
               this.sampleData[i].index = i+1
             }
+            console.log('add row',this.sampleData, this.sampleCol)
             setTimeout(()=>{
               this.tableLoading = false
             },200)
@@ -446,6 +422,7 @@
                       for(let i=0; i<this.sampleData.length; i++){
                         this.sampleData[i].index = i+1
                       }
+                      console.log('delete row',this.sampleData, this.sampleCol)
                       setTimeout(()=>{
                         this.tableLoading = false
                       },200)
@@ -555,6 +532,7 @@
             this.blur(item)
           },
           newColSelectChange(selection){
+              //console.log('selection',selection)
               this.newColumnNameSelectedArray=selection;
           },
           applyAll(name,itemCol,itemRow,type,index){
@@ -670,12 +648,26 @@
         },
         data(oldValue, newValue){
             this.sampleData = cloneDeep(newValue)
-            //console.log('this.sampleData',this.sampleData)
+            console.log('this.sampleData',this.sampleData)
         },
         columns(oldValue, newValue){
             this.sampleCol = cloneDeep(newValue)
-            //console.log('this.sampleCol',this.sampleCol)
+            console.log('this.sampleCol',this.sampleCol)
         },
+        addedCol(oldValue, newValue){
+            //TODO:check if it is the oldValue
+            for(let i in oldValue){
+              let item = {
+                name:oldValue[i].name,
+                key:oldValue[i].name.replace(/\s+/g,"") + Math.floor(100000 + Math.random() * 900000),
+                required:false,
+                searchable:oldValue[i].searchable,
+              }
+              this.addedColData.push(item)
+            }
+            // console.log(oldValue)
+            // console.log(this.addedColData)
+        }
     },
     computed:{
       tableLoadingTemp: function(){
@@ -794,9 +786,6 @@
     left: 10px;*/
     cursor: default;
     /*margin-right: 5px;*/
-  }
-  .add-col-table{
-    /*height: 500px;*/
   }
   .index-col{
     position: relative;
@@ -965,6 +954,8 @@
     }
     .add-col-table table{
         margin-bottom:0 !important;
+        max-height: 400px;
+        overflow-y: scroll;
     }
     /*.add-col-table tbody th, table tbody td, table thead th, table thead td, table tfoot th, table tfoot td{
         padding: 0 !important;
@@ -1051,5 +1042,13 @@
     .card.annotation .card-content{
       overflow: auto;
       display: flex;
+    }
+    /*.add-col-table .ivu-table-body{
+      max-height: 400px;
+      overflow-y: scroll;
+    }*/
+    .addColModal .ivu-modal-body{
+      max-height: 400px;
+      overflow-y: scroll;
     }
 </style>

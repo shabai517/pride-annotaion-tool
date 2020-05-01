@@ -21,7 +21,7 @@
               </Card>
           </Row>  -->
           <Row>
-                <selfTable :name="name" :height='tableHeight' :loading="loading" :columns="sampleCol" :data="sampleData"></selfTable>
+                <selfTable :name="name" :height='tableHeight' :loading="loading" :columns="sampleCol" :addedCol="addedCol" :data="sampleData"></selfTable>
                 <div class="button-wrapper">
                 <div class="search-button">
                     <Button type="primary" @click="back">Back</Button>
@@ -47,8 +47,10 @@
            sampleCol:[],
            sampleData:[],
            keyList:[],
+           addedCol:[],
            screenHeight: document.documentElement.clientHeight,
            getTableDataAPI:this.$store.state.baseApiURL + '/properties/getPropertiesFromText',
+           getAddedColAPI:this.$store.state.baseApiURL + '/properties/getProperties',
       }
     },
     beforeRouteUpdate:function (to, from, next) {
@@ -77,29 +79,26 @@
                       align: 'center',
                       required: true,
                   })
-                  // let properties = ''
-                  // for(let j in header){
-                  //     if(header[j].match(/\[/))
-                  //       properties+=(header[j]+', ')
-                  // }
-                  // let sdrf_properties = properties.slice(0,properties.length-2)
-                  // let query = {
-                  //     sdrf_properties:sdrf_properties,
-                  //     // sdrf_properties:'Characteristics[organism], Characteristics[organism part], Characteristics[age], Characteristics[developmental stage], Characteristics[sex], Characteristics[disease], Characteristics[individual], comment[fraction identifier], comment[file uri], comment[instrument], comment[label], comment[cleavage agent details], comment[modification parameters], comment[modification parameters], comment[precursor mass tolerance], comment[fragment mass tolerance], comment[data file]',
-                  //   }
-                  // let results = await this.$http.get(this.getTableDataAPI,{params: query})
-                  // console.log('results',results)
+                  let properties = ''
                   for(let j in header){
-                      let item = {
-                        name:header[j],
-                        key:header[j].replace(/\s+/g,"") + Math.floor(100000 + Math.random() * 900000),
-                        className:this.setClassName(header[j].replace(/\s+/g,"")),
-                        required: false,
-                        searchable : true,
-
-                      }
-                      this.keyList.push(item.key)
-                      this.sampleCol.push(item)
+                      // if(header[j].match(/\[/))
+                        properties+=(header[j]+', ')
+                  }
+                  let sdrf_properties = properties.slice(0,properties.length-2)
+                  let query = {
+                      sdrf_properties:sdrf_properties,
+                      // sdrf_properties:'Characteristics[organism], Characteristics[organism part], Characteristics[age], Characteristics[developmental stage], Characteristics[sex], Characteristics[disease], Characteristics[individual], comment[fraction identifier], comment[file uri], comment[instrument], comment[label], comment[cleavage agent details], comment[modification parameters], comment[modification parameters], comment[precursor mass tolerance], comment[fragment mass tolerance], comment[data file]',
+                    }
+                  let results = await this.$http.get(this.getTableDataAPI,{params: query})
+                  for(let i in results.body){
+                    let item = {
+                      name:results.body[i].freeTextColumn,
+                      key:results.body[i].freeTextColumn.replace(/\s+/g,"") + Math.floor(100000 + Math.random() * 900000),
+                      required:false,
+                      searchable:results.body[i].templateColumn.searchable
+                    }
+                    this.keyList.push(item.key)
+                    this.sampleCol.push(item)
                   }
                 }
                 else{ //for the table data
@@ -114,9 +113,10 @@
                       }
                   }
                   this.sampleData.push(item)
-                }
+                }  
             }
-            console.log('this.sampleData',this.sampleData)
+            let tempAddedCol = await this.$http.get(this.getAddedColAPI)
+            this.addedCol = tempAddedCol.body
             this.loading=false
             //console.log(this.sampleCol,this.sampleData)
             //this.$forceUpdate()
