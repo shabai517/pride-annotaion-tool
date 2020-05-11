@@ -16,7 +16,7 @@
                   <!-- <div :style="{'padding-top': rowStart*45+'px'}"></div> -->
                   <div class="table-col" v-for="(itemCol,i) in sampleCol" :key="itemCol.key">
                       <div class="table-row first">
-                        <Icon class="icon-in-th-left" type="ios-remove-circle-outline" @click="removeAll(itemCol.key)" size="14"></Icon>
+                       <!--  <Icon class="icon-in-th-left" type="ios-remove-circle-outline" @click="removeAll(itemCol.key)" size="14"></Icon> -->
                         {{itemCol.name}}
                         <Icon class="icon-in-th-right" type="ios-close-circle-outline" @click="deleteCol(itemCol,i)" size="14"></Icon>
                         <Icon style="position: absolute; top: 0px; right: 0px" class="icon-in-th-right" type="ios-add-circle-outline" size="6" @click="showAddColModal(i)"></Icon>
@@ -272,6 +272,7 @@
                           itemRow[itemCol.key].dropdown=true;
                           this.dropdown.visible = true
                         }
+                        console.log('getAutoCompleteList',res.body)
                         this.dropdownOptions=res.body;
                         if(this.dropdownOptions.length == 0){
                             itemRow[itemCol.key].value=searchValue;
@@ -322,10 +323,7 @@
               item.active=false;
               item.dropdown = false;
 
-
-
-
-              if(item.col.required){
+              if(item.required){
                 if(item.value)
                   item.checked=true;
                 else
@@ -340,7 +338,7 @@
                 this.dropdown.type = null
                 this.dropdown.col = null
                 this.dropdown.row = null
-              },100);
+              },200);//set 200ms to avoid dropdown click item of "null"
           },
           removeInputContent(item){
               //item.dropdown = false;
@@ -355,7 +353,6 @@
           addCol(){
               for(let i=0; i<this.newColumnNameSelectedArray.length; i++){
                   let item = this.newColumnNameSelectedArray[i]
-                  console.log('item',item)
                   this.colIndex++
                   this.sampleCol.splice(this.colIndex, 0, item);
                   for(let j=0; j<this.sampleData.length; j++){
@@ -366,7 +363,6 @@
                       }
                   }
               }
-              console.log('add col',this.sampleData, this.sampleCol)
           },
           deleteCol(itemCol, index){
             this.$Modal.confirm({
@@ -435,10 +431,11 @@
               });
           },
           showCopyModal(item,col,row){
-            this.pasteIndex = {item,row,col};
-            this.copyValue='';
-            this.copyArray=[];
-            this.copyModalBool=true;
+            this.$Message.error({content:'Coming Soon', duration:2});
+            // this.pasteIndex = {item,row,col};
+            // this.copyValue='';
+            // this.copyArray=[];
+            // this.copyModalBool=true;
           },
           copy(){
             document.querySelector('#text-to-copy textarea').select();
@@ -516,6 +513,7 @@
           },
           
           dropdownClick(e,item){
+            console.log('dropdownClick',item)
             item.dropdown=false;
             if(e == "nodata" && !item.value){
                 item.icon="";
@@ -526,8 +524,18 @@
             
             for(let i=0; i<this.dropdownOptions.length;i++){
                 if(this.dropdownOptions[i].name==e){
-                    item.accession = this.dropdownOptions[i].accession;
-                    item.cvLabel = this.dropdownOptions[i].cvLabel;
+                  //TODO:set data for sample data
+                    // item[this.keyList[j].key]={
+                    //     value:body[j],
+                    //     checked:true,
+                    //     active:false,
+                    //     required:this.keyList[j].required
+                    //   }
+
+
+                      // item.value = 
+                    // item.accession = this.dropdownOptions[i].accession;
+                    // item.cvLabel = this.dropdownOptions[i].cvLabel;
                     break;
                 }
             }
