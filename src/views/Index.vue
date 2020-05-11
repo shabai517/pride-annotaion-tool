@@ -2,8 +2,8 @@
     <div class="index-container">
         <div class="title">Omics Sample to Data Annotation Tool</div>
         <div class="action">
-            <Button class="button" type="primary" @click="gotoPublicDataset">Public Dataset</Button>
-            <Button class="button"type="primary" @click="gotoNewDataset">New Dataset</Button>
+            <Button class="button" type="primary" @click="gotoPublicDataset" v-bind:disabled="true">Public Dataset</Button>
+            <Button class="button" type="primary" @click="gotoNewDataset" v-bind:disabled="true">New Dataset</Button>
             <Button class="button" type="primary" @click="gotosSRDF">Load SRDF</Button>
         </div>
         <div class="content">
