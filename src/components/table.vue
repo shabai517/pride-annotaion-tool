@@ -240,6 +240,9 @@
     },
     methods:{
           async getAutoCompleteList(itemCol,itemRow){
+              console.log(itemCol,itemRow)
+              if(!itemCol.searchable)
+                  return
               let searchValue = itemRow[itemCol.key].value;
               if(searchValue)
                   itemRow[itemCol.key].icon = 'close-circled'
@@ -250,9 +253,9 @@
               }
               this.dropdownOptions=[];
               let query={
-                attributeAccession: itemCol.accession,
-                ontologyAccession: itemCol.cvLabel,
-                keyword:searchValue
+                accession: itemCol.ontologyTerm.iri_id,
+                ontology: itemCol.ontologyTerm.ontology,
+                filter:searchValue
               }
               clearTimeout(this.timeoutId);
               this.timeoutId = 0;
@@ -266,13 +269,12 @@
 
                         this.dropdown.visible = true
                         if(res.body.length>0 || searchValue){
-                          //itemRow[itemCol.key].dropdown=true;
-                          // this.dropdown.visible = true
+                          itemRow[itemCol.key].dropdown=true;
+                          this.dropdown.visible = true
                         }
-
                         this.dropdownOptions=res.body;
                         if(this.dropdownOptions.length == 0){
-                            itemRow[itemCol.key].value==searchValue;
+                            itemRow[itemCol.key].value=searchValue;
                         }
                     }
                     catch(e){
@@ -294,7 +296,7 @@
           },
           focus(e,itemCol,itemRow,index){
               let left = e.target.parentNode.parentNode.parentNode.offsetLeft-document.querySelector('.card-content').scrollLeft;
-              let top = e.target.parentNode.parentNode.parentNode.offsetTop;
+              let top = e.target.parentNode.parentNode.offsetTop;
 
               itemRow[itemCol.key].active=true;
 
@@ -306,7 +308,7 @@
               this.dropdown.top = top
               this.dropdown.left =left
 
-              console.log('focus',this.dropdown);
+              //console.log('focus',this.dropdown);
               if(!itemRow[itemCol.key].value)
                 return;
               this.getAutoCompleteList(itemCol,itemRow);
@@ -318,7 +320,11 @@
           blur(item){
               console.log('blurblur',item);
               item.active=false;
-              //item.dropdown = false;
+              item.dropdown = false;
+
+
+
+
               if(item.col.required){
                 if(item.value)
                   item.checked=true;
@@ -346,22 +352,18 @@
             this.addColumnBool=true;
             this.colIndex = index
           },
-          addCol(){//TODO:这里要继续编
+          addCol(){
               for(let i=0; i<this.newColumnNameSelectedArray.length; i++){
-                  let item = {
-                    name: this.newColumnNameSelectedArray[i].name,
-                    key: this.newColumnNameSelectedArray[i].key,
-                    required: this.newColumnNameSelectedArray[i].required,
-                    searchable: this.newColumnNameSelectedArray[i].searchable
-                  }
+                  let item = this.newColumnNameSelectedArray[i]
+                  console.log('item',item)
                   this.colIndex++
                   this.sampleCol.splice(this.colIndex, 0, item);
                   for(let j=0; j<this.sampleData.length; j++){
-                      this.$set(this.sampleData[j],item.key,{
-                          value:'',
-                          checked:true,
-                          active:false,
-                      })
+                      this.sampleData[j][item.key] = {
+                        value:'',
+                        checked:true,
+                        active:false
+                      }
                   }
               }
               console.log('add col',this.sampleData, this.sampleCol)
@@ -532,7 +534,7 @@
             this.blur(item)
           },
           newColSelectChange(selection){
-              //console.log('selection',selection)
+              console.log('selection',selection)
               this.newColumnNameSelectedArray=selection;
           },
           applyAll(name,itemCol,itemRow,type,index){
