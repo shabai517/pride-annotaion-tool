@@ -90,7 +90,7 @@
                       // sdrf_properties:'Characteristics[organism], Characteristics[organism part], Characteristics[age], Characteristics[developmental stage], Characteristics[sex], Characteristics[disease], Characteristics[individual], comment[fraction identifier], comment[file uri], comment[instrument], comment[label], comment[cleavage agent details], comment[modification parameters], comment[modification parameters], comment[precursor mass tolerance], comment[fragment mass tolerance], comment[data file]',
                     }
                   let results = await this.$http.get(this.getTableDataAPI,{params: query})
-                  console.log('results',results)
+                  //console.log('results',results)
                   for(let i in results.body){
                     let item = {
                       name:results.body[i].freeTextColumn,
@@ -100,7 +100,7 @@
                       ontologyTerm:results.body[i].templateColumn.ontologyTerm ? results.body[i].templateColumn.ontologyTerm : null,
                       searchable:results.body[i].templateColumn.searchable
                     }
-                    this.keyList.push(item.key)
+                    this.keyList.push(item)
                     this.sampleCol.push(item)
                   }
                 }
@@ -109,11 +109,13 @@
                   let item = {}
                   for(let j in body){
                       item.index=parseInt(i)
-                      item[this.keyList[j]]={
+                      item[this.keyList[j].key]={
                         value:body[j],
                         checked:true,
                         active:false,
+                        required:this.keyList[j].required
                       }
+                      //console.log('item',item)
                   }
                   this.sampleData.push(item)
                 }  
