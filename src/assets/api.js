@@ -10,7 +10,7 @@ export default {
 			getSampleAttributes : async ()=>{
 				try{
 					let resutls
-					let tempResutls = await	$http.get($store.state.baseApiURL+'/annotator/sampleAttributes')
+					let tempResutls = await	$http.get($store.state.baseApiURL+'/annotator/sampleAttributes')  
 					//TO DO: logic
 					resutls = tempResutls
 					return resutls;
@@ -24,8 +24,7 @@ export default {
 			getValuesByAttributes : async (query)=>{
 				try{
 					let resutls
-					let tempResutls = await	$http.get($store.state.baseApiURL+'/annotator/valuesByAttribute',{params: query})
-					console.log('tempResutls',tempResutls);
+					let tempResutls = await	$http.get($store.state.baseApiURL+'/properties/findValuesByProperty',{params: query})
 					//TO DO: logic
 					resutls = tempResutls
 					return resutls;
