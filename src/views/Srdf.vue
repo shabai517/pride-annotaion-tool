@@ -76,7 +76,7 @@
                   this.sampleCol.push({
                       name: '#',
                       key: 'index',
-                      align: 'center',
+                      // align: 'center',
                       required: true,
                   })
                   let properties = ''
@@ -90,11 +90,14 @@
                       // sdrf_properties:'Characteristics[organism], Characteristics[organism part], Characteristics[age], Characteristics[developmental stage], Characteristics[sex], Characteristics[disease], Characteristics[individual], comment[fraction identifier], comment[file uri], comment[instrument], comment[label], comment[cleavage agent details], comment[modification parameters], comment[modification parameters], comment[precursor mass tolerance], comment[fragment mass tolerance], comment[data file]',
                     }
                   let results = await this.$http.get(this.getTableDataAPI,{params: query})
+                  console.log('results',results)
                   for(let i in results.body){
                     let item = {
                       name:results.body[i].freeTextColumn,
                       key:results.body[i].freeTextColumn.replace(/\s+/g,"") + Math.floor(100000 + Math.random() * 900000),
                       required:false,
+                      typeNode:results.body[i].templateColumn.typeNode ? results.body[i].templateColumn.typeNode : '',
+                      ontologyTerm:results.body[i].templateColumn.ontologyTerm ? results.body[i].templateColumn.ontologyTerm : null,
                       searchable:results.body[i].templateColumn.searchable
                     }
                     this.keyList.push(item.key)
@@ -116,7 +119,12 @@
                 }  
             }
             let tempAddedCol = await this.$http.get(this.getAddedColAPI)
+            for(let i in tempAddedCol.body){
+                tempAddedCol.body[i].key = tempAddedCol.body[i].name.replace(/\s+/g,"") + Math.floor(100000 + Math.random() * 900000),
+                tempAddedCol.body[i].required = false
+            }
             this.addedCol = tempAddedCol.body
+            console.log('addedCol',this.addedCol)
             this.loading=false
             //console.log(this.sampleCol,this.sampleData)
             //this.$forceUpdate()
