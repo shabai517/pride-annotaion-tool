@@ -16,7 +16,7 @@
                   <!-- <div :style="{'padding-top': rowStart*45+'px'}"></div> -->
                   <div class="table-col" v-for="(itemCol,i) in sampleCol" :key="itemCol.key">
                       <div class="table-row first">
-                       <!--  <Icon class="icon-in-th-left" type="ios-remove-circle-outline" @click="removeAll(itemCol.key)" size="14"></Icon> -->
+                        <Icon class="icon-in-th-left" type="ios-remove-circle-outline" @click="removeAll(itemCol.key)" size="14"></Icon>
                         {{itemCol.name}}
                         <Icon class="icon-in-th-right" type="ios-close-circle-outline" @click="deleteCol(itemCol,i)" size="14"></Icon>
                         <Icon style="position: absolute; top: 0px; right: 0px" class="icon-in-th-right" type="ios-add-circle-outline" size="6" @click="showAddColModal(i)"></Icon>
@@ -54,10 +54,10 @@
           <Dropdown class="dropdown-remote" :style="{left:dropdown.left + 'px', top:dropdown.top + 'px'}" trigger="custom" :visible="dropdown.visible" placement="bottom-end" @on-click="dropdownClick($event,dropdown.row[dropdown.col.key])">
               <DropdownMenu slot="list">
                   <DropdownItem v-if="dropdownOptions.length == 0" name="nodata">No data
-                      <Icon class="apply-all-button" type="arrow-down-a" size="15" @click.stop="applyAll('no data',dropdown.col,dropdown.row,dropdown.type,dropdown.index)"></Icon>
+                      <Icon class="apply-all-button" type="md-arrow-round-down" size="15" @click.stop="applyAll('no data',dropdown.col,dropdown.row,dropdown.index)"></Icon>
                   </DropdownItem>
                   <DropdownItem v-for="item in dropdownOptions" :name="item.name" :key="item.name">{{item.name}}
-                      <Icon class="apply-all-button" type="arrow-down-a" size="15" @click.stop="applyAll(item.name,dropdown.col,dropdown.row,dropdown.type,dropdown.index)"></Icon>
+                      <Icon class="apply-all-button" type="md-arrow-round-down" size="15" @click.stop="applyAll(item.name,dropdown.col,dropdown.row,dropdown.index)"></Icon>
                   </DropdownItem>
               </DropdownMenu>
           </Dropdown>
@@ -309,7 +309,6 @@
               this.dropdown.top = top
               this.dropdown.left =left
 
-              //console.log('focus',this.dropdown);
               if(!itemRow[itemCol.key].value)
                 return;
               this.getAutoCompleteList(itemCol,itemRow);
@@ -335,7 +334,6 @@
                   return;
                 this.dropdown.visible = false
                 this.dropdown.index = null
-                this.dropdown.type = null
                 this.dropdown.col = null
                 this.dropdown.row = null
               },200);//set 200ms to avoid dropdown click item of "null"
@@ -545,19 +543,25 @@
               console.log('selection',selection)
               this.newColumnNameSelectedArray=selection;
           },
-          applyAll(name,itemCol,itemRow,type,index){
+          applyAll(name,itemCol,itemRow,index){
                this.tableLoading=true;
                let tempValue = itemRow[itemCol.key].value;
                this.dropdownClick(name,itemRow[itemCol.key]);
                this.$nextTick(()=>{ //make the value bind with the input first and then apply this value to all the other rows
-                  if(type == 'sampledata')
-                    for(let i=index;i<this.sampleData.length; i++){
-                        let newItem =  JSON.parse(JSON.stringify(itemRow[itemCol.key]));
-                        if(tempValue == this.sampleData[i][itemCol.key].value || !this.sampleData[i][itemCol.key].value)
-                          this.sampleData[i][itemCol.key] = newItem;
-                        
-                    }
+                  for(let i=index;i<this.sampleData.length; i++){
+                      let newItem =  JSON.parse(JSON.stringify(itemRow[itemCol.key]));
+                      console.log('newItem',newItem)
+                      if(tempValue == this.sampleData[i][itemCol.key].value || !this.sampleData[i][itemCol.key].value){
+                        //TODO:
+                        this.sampleData[i][itemCol.key].value = newItem.value
+                        // this.sampleData[i][itemCol.key] = newItem;
+                      }
+                      
+                  }
                   this.blur(itemRow[itemCol.key]);
+                  //current no need to force update
+                  // this.$forceUpdate();
+                  this.tableLoading=false;
               });
           },
           removeAll(key){
