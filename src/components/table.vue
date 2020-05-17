@@ -24,9 +24,9 @@
                       <!-- <div class="table-row" v-for="(itemRow,j) in sampleData.slice(rowStart,rowEnd)"> -->
                       <div class="table-row" :class="{'index':itemCol.key=='index'}" v-for="(itemRow,j) in sampleData">
                             <template v-if="itemCol.key!='index'">
-                                  <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key].value)" @on-change="getAutoCompleteList(itemCol,itemRow)" @on-focus="focus($event,itemCol,itemRow,j)" @on-blur="inputBlur(itemRow[itemCol.key])">
+                                  <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="(itemCol.key.match('modification') && itemRow[itemCol.key].active) ? 'ios-search-outline':''" @on-click ="showPTMsModal(itemCol,itemRow)" @on-change="getAutoCompleteList(itemCol,itemRow)" @on-focus="focus($event,itemCol,itemRow,j)" @on-blur="inputBlur(itemRow[itemCol.key])">
                                   </Input>
-                                  <div class="copy-icon"><Icon @click="showCopyModal(itemRow[itemCol.key],itemCol.key,j)" type="ios-copy-outline" size="16"></Icon></div>
+                                  <div class="copy-icon"><Icon @click="showCopyModal(itemRow,itemCol,j)" type="ios-copy-outline" size="16"></Icon></div>
                             </template>
                             <template v-else>
                                 <Icon v-if="sampleData.length>1" class="icon-in-row" type="ios-remove-circle-outline" @click="deleteRow(itemRow,j)" size="14"></Icon>
@@ -261,7 +261,7 @@
               this.timeoutId = 0;
               this.timeoutId = setTimeout( async()=> {
                     try{
-                        let res = await this.$Api.getValuesByAttributes(query) 
+                        let res = await this.$Api.getValuesByAttributes(query,itemCol.key) 
                         if(this.timeoutId == 0)
                           return;
                         if(!itemRow[itemCol.key].active)
@@ -299,7 +299,12 @@
               let left = e.target.parentNode.parentNode.parentNode.offsetLeft-document.querySelector('.card-content').scrollLeft;
               let top = e.target.parentNode.parentNode.offsetTop;
 
+              console.log('itemCol',itemCol)
+
               itemRow[itemCol.key].active=true;
+
+              if(itemCol.key.match('modification'))
+                return
 
               this.dropdown.focus = itemCol.key+index
               this.dropdown.visible = false
@@ -311,6 +316,7 @@
 
               if(!itemRow[itemCol.key].value)
                 return;
+
               this.getAutoCompleteList(itemCol,itemRow);
           },
           inputBlur(item){
@@ -428,12 +434,21 @@
                   }
               });
           },
-          showCopyModal(item,col,row){
-            this.$Message.error({content:'Coming Soon', duration:2});
-            // this.pasteIndex = {item,row,col};
-            // this.copyValue='';
-            // this.copyArray=[];
-            // this.copyModalBool=true;
+          showCopyModal(row, col, index){//itemRow[itemCol.key],itemCol.key,j   //row col index
+           
+
+            //this.$Message.error({content:'Coming Soon', duration:2});
+            this.pasteIndex = {
+              row:row,
+              col:col,
+              index:index
+            };
+            this.copyValue='';
+            this.copyArray=[];
+            this.copyModalBool=true;
+          },
+          showPTMsModal(col,row){
+
           },
           copy(){
             document.querySelector('#text-to-copy textarea').select();
@@ -442,62 +457,30 @@
           },
           paste(){
             if(this.pasteIndex && this.copyValue){
+              this.tableLoading=true;
               setTimeout(()=>{
-                this.tableLoading=true;
+
                 let msrunBool = null;
                 let tempArray = this.copyValue.split('\n');
-                console.log(this.sampleNumber * this.fractionNumber)
-                console.log(this.pasteIndex.row)
-                console.log(tempArray.length)
-                if((this.sampleNumber * this.fractionNumber - this.pasteIndex.row) < tempArray.length){
+                console.log('tempArray',tempArray)
+                console.log('this.pasteIndex.index',this.pasteIndex.index)
+                if((this.sampleData.length - this.pasteIndex.index) < tempArray.length){ //How to caclate the length of the table needs to be considered
                   this.tableLoading=false;
-                  this.$Message.error({content:'Not enough rows to paste, please check', duration:2});
+                  this.$Message.error({content:'Insufficient Rows', duration:3});
                   return
                 }
-                for(let i in this.msRunArray[0]){
-                    if(this.pasteIndex.col == i){
-                      msrunBool = true;
-                      break;
+                
+                for(let i=0; i< tempArray.length; i++){
+                    if(this.sampleData[parseInt(this.pasteIndex.index)+parseInt(i)]){
+                      this.sampleData[parseInt(this.pasteIndex.index)+parseInt(i)][this.pasteIndex.col.key].value= tempArray[i];
+                      this.sampleData[parseInt(this.pasteIndex.index)+parseInt(i)][this.pasteIndex.col.key].icon= 'close-circled';
+                      this.sampleData[parseInt(this.pasteIndex.index)+parseInt(i)][this.pasteIndex.col.key].checked = true;
                     }
                 }
-                if(!msrunBool)
-                  for(let i=0; i< tempArray.length; i++){
-                      if(this.sampleData[parseInt(this.pasteIndex.row)+parseInt(i)]){
-                        this.sampleData[parseInt(this.pasteIndex.row)+parseInt(i)][this.pasteIndex.col].value= tempArray[i];
-                        this.sampleData[parseInt(this.pasteIndex.row)+parseInt(i)][this.pasteIndex.col].icon= 'close-circled';
-                        this.sampleData[parseInt(this.pasteIndex.row)+parseInt(i)][this.pasteIndex.col].checked = true;
-                      }
-                  }
-                else{
-                  if(this.pasteIndex.col != 'msrun')
-                      for(let i=0; i< tempArray.length; i++){
-                          if(this.msRunArray[parseInt(this.pasteIndex.row)+parseInt(i)]){
-                            this.msRunArray[parseInt(this.pasteIndex.row)+parseInt(i)][this.pasteIndex.col].value= tempArray[i];
-                            this.msRunArray[parseInt(this.pasteIndex.row)+parseInt(i)][this.pasteIndex.col].icon= 'close-circled';
-                            this.msRunArray[parseInt(this.pasteIndex.row)+parseInt(i)][this.pasteIndex.col].checked = true;
-                          }
-                      }
-                  else{
-                      for(let i=0; i< tempArray.length; i++){
-                          if(this.msRunArray[parseInt(this.pasteIndex.row)+parseInt(i)]){
-                            let found = false;
-                            for(let j=0; j<this.msRunModalTableData.length; j++){
-                                if(tempArray[i] == this.msRunModalTableData[j].name){
-                                  found = true;
-                                  break;
-                                }
-                            }
-                            if(found){
-                                this.msRunArray[parseInt(this.pasteIndex.row)+parseInt(i)][this.pasteIndex.col].value= tempArray[i];
-                                this.msRunArray[parseInt(this.pasteIndex.row)+parseInt(i)][this.pasteIndex.col].icon= 'close-circled';
-                                this.msRunArray[parseInt(this.pasteIndex.row)+parseInt(i)][this.pasteIndex.col].checked = true;
-                            }
-                          }
-                      }
-                  }
-                }
-                this.blur(this.pasteIndex.item);
-              },80)
+    
+                this.blur(this.pasteIndex.row[this.pasteIndex.col.key]);
+                this.tableLoading=false;
+              },100)
             }
           },
           modalVisibleChange(stat){
@@ -715,7 +698,7 @@
     display: flex;
   }
   .table-col:first-child{
-      border-left: 1px solid #e9eaec;
+      /*border-left: 1px solid #e9eaec;*/
   }
   .table-col:first-child .table-row.first{
       padding: 10px;
@@ -728,7 +711,6 @@
       /*min-width: 200px;*/
       width: auto;
       max-width: 300px;
-      border-right: 1px solid #e9eaec;
   }
    .table-col:last-child{
       min-width: 350px;
@@ -758,6 +740,7 @@
       /*padding: 10px 5px;*/
       position: relative;
       height:45px;
+      border-right: 1px solid #e9eaec;
   }
   .table-row.first{
     /*cursor: all-scroll;*/
@@ -785,6 +768,19 @@
   .table-row .copy-icon:hover{
     opacity: 0.6
   }
+  .table-row .search-icon{
+    position: absolute;
+    right:10px;
+    top: 12px;
+    display: none;
+    cursor: pointer;
+  }
+  .table-row:hover .search-icon{
+    display: block;
+  }
+  .table-row .search-icon:hover{
+    opacity: 0.6
+  }
   .icon-in-th-right{
     position: absolute;
     right: 10px;
@@ -810,6 +806,7 @@
   }
   .table-row.index{
     padding: 10px 5px;
+    border-left: 1px solid #e9eaec;
   }
   .table-row.index i{
     cursor: pointer;
