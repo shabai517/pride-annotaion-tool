@@ -261,7 +261,7 @@
               this.timeoutId = 0;
               this.timeoutId = setTimeout( async()=> {
                     try{
-                        let res = await this.$Api.getValuesByAttributes(query,itemCol.key) 
+                        let res = await this.$Api.getValuesByAttributes(query) 
                         if(this.timeoutId == 0)
                           return;
                         if(!itemRow[itemCol.key].active)
@@ -766,19 +766,6 @@
     display: block;
   }
   .table-row .copy-icon:hover{
-    opacity: 0.6
-  }
-  .table-row .search-icon{
-    position: absolute;
-    right:10px;
-    top: 12px;
-    display: none;
-    cursor: pointer;
-  }
-  .table-row:hover .search-icon{
-    display: block;
-  }
-  .table-row .search-icon:hover{
     opacity: 0.6
   }
   .icon-in-th-right{
