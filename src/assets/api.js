@@ -21,11 +21,20 @@ export default {
 					//throw {err:e.body.error}
 				}
 			},
-			getValuesByAttributes : async (query)=>{
+			getValuesByAttributes : async (query,type)=>{
 				try{
 					let resutls
-					let tempResutls = await	$http.get($store.state.baseApiURL+'/properties/findValuesByProperty',{params: query})
-					//TO DO: logic
+					let tempResutls
+					console.log('type',type)
+					if(type.match('modification')){
+						tempResutls = await	$http.get($store.state.baseApiURL+'/complexproperties/findPostTranslationalModifications',{params: query})
+						//TO DO: logic
+						
+					}
+					else{
+						tempResutls = await	$http.get($store.state.baseApiURL+'/properties/findValuesByProperty',{params: query})
+					}
+					console.log('tempResutls',tempResutls)
 					resutls = tempResutls
 					return resutls;
 				}
