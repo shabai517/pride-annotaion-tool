@@ -60,25 +60,27 @@
       selfTable
     },
     methods:{
-      readFile(file){
-        var files = file.target.files || file.dataTransfer.files;
+      readFile(event){
+        var files = event.target.files || event.dataTransfer.files;
         if (!files.length)
           return;
 
         let reader = new FileReader();
         reader.readAsText(files[0],'UTF-8');
         this.loading=true
+        console.log('重置数据')
+        // this.$set
+        this.sampleCol=[]
+        this.sampleData=[]
+        this.keyList=[]
+        this.addedCol=[]
         reader.onload =  async (e)=> {
             let arr = e.currentTarget.result.split('\n');
+
+            // this.sampleData = []
             for(let i in arr){
                 if(i == 0){ //for first row which is the col in the table
                   let header = arr[i].split('\t');
-                  this.sampleCol.push({
-                      name: '#',
-                      key: 'index',
-                      // align: 'center',
-                      required: true,
-                  })
                   let properties = ''
                   for(let j in header){
                       // if(header[j].match(/\[/))
@@ -90,6 +92,13 @@
                       // sdrf_properties:'Characteristics[organism], Characteristics[organism part], Characteristics[age], Characteristics[developmental stage], Characteristics[sex], Characteristics[disease], Characteristics[individual], comment[fraction identifier], comment[file uri], comment[instrument], comment[label], comment[cleavage agent details], comment[modification parameters], comment[modification parameters], comment[precursor mass tolerance], comment[fragment mass tolerance], comment[data file]',
                     }
                   let results = await this.$http.get(this.getTableDataAPI,{params: query})
+                  // this.sampleCol = []
+                  this.sampleCol.push({
+                      name: '#',
+                      key: 'index',
+                      // align: 'center',
+                      required: true,
+                  })
                   //console.log('results',results)
                   for(let i in results.body){
                     let item = {
@@ -119,15 +128,20 @@
                   }
                   this.sampleData.push(item)
                 }  
+
             }
+            console.log('重新赋值sampleDaTA')
             let tempAddedCol = await this.$http.get(this.getAddedColAPI)
             for(let i in tempAddedCol.body){
                 tempAddedCol.body[i].key = tempAddedCol.body[i].name.replace(/\s+/g,"") + Math.floor(100000 + Math.random() * 900000),
                 tempAddedCol.body[i].required = false
             }
             this.addedCol = tempAddedCol.body
-            console.log('addedCol',this.addedCol)
+            // console.log('addedCol',this.addedCol)
             this.loading=false
+
+            //reset value for loading the same file
+            event.target.value = ''
             //console.log(this.sampleCol,this.sampleData)
             //this.$forceUpdate()
         };
