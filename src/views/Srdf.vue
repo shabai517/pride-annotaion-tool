@@ -68,7 +68,6 @@
         let reader = new FileReader();
         reader.readAsText(files[0],'UTF-8');
         this.loading=true
-        console.log('重置数据')
         // this.$set
         this.sampleCol=[]
         this.sampleData=[]
@@ -130,7 +129,6 @@
                 }  
 
             }
-            console.log('重新赋值sampleDaTA')
             let tempAddedCol = await this.$http.get(this.getAddedColAPI)
             for(let i in tempAddedCol.body){
                 tempAddedCol.body[i].key = tempAddedCol.body[i].name.replace(/\s+/g,"") + Math.floor(100000 + Math.random() * 900000),
