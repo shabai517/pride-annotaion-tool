@@ -8,57 +8,60 @@
             <a @click="showAddColModal"><span>Add Col</span><Icon type="ios-add" size="20"></Icon></a>
             <a @click="addRow"><span>Add Row</span><Icon class="add-row-icon" type="ios-add" size="20"></Icon></a>
           </p> -->
-          <div class="card-content" @scroll="scroll" :style="{height:height + 'px'}">
+          <!-- <div class="card-content" @scroll="scroll" :style="{height:height + 'px'}"> -->
+          <div class="card-content" :style="{height:height + 'px'}">
               <div v-if="sampleData.length == 0" class="no-data-table-wrapper">
                   <span>No data</span>
               </div>
               <template v-else>
                   <!-- <div :style="{'padding-top': rowStart*45+'px'}"></div> -->
-                  <div class="table-col" v-for="(itemCol,i) in sampleCol" :key="itemCol.key">
-                      <div class="table-row first">
-                        <Icon class="icon-in-th-left" type="ios-remove-circle-outline" @click="removeAll(itemCol.key)" size="14"></Icon>
-                        {{itemCol.name}}
-                        <Icon class="icon-in-th-right" type="ios-close-circle-outline" @click="deleteCol(itemCol,i)" size="14"></Icon>
-                        <Icon style="position: absolute; top: 0px; right: 0px" class="icon-in-th-right" type="ios-add-circle-outline" size="6" @click="showAddColModal(i)"></Icon>
-                      </div>
-                      <!-- <div class="table-row" v-for="(itemRow,j) in sampleData.slice(rowStart,rowEnd)"> -->
-                      <div class="table-row" :class="{'index':itemCol.key=='index'}" v-for="(itemRow,j) in sampleData">
-                            <template v-if="itemCol.key!='index'">
-                                  <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="(itemCol.key.match('modification') && itemRow[itemCol.key].active) ? 'ios-search-outline':''" @on-click ="showPTMsModal(itemCol,itemRow)" @on-change="getAutoCompleteList(itemCol,itemRow)" @on-focus="focus($event,itemCol,itemRow,j)" @on-blur="inputBlur(itemRow[itemCol.key])">
-                                  </Input>
-                                  <div class="copy-icon"><Icon @click="showCopyModal(itemRow,itemCol,j)" type="ios-copy-outline" size="16"></Icon></div>
-                            </template>
-                            <template v-else>
-                                <Icon v-if="sampleData.length>1" class="icon-in-row" type="ios-remove-circle-outline" @click="deleteRow(itemRow,j)" size="14"></Icon>
-                                <Icon style="position: absolute; bottom: 0px; left: 0px" class="icon-in-row" type="ios-add-circle-outline" size="6" @click="addRow(j)"></Icon>
-                                <div class="index-col">
-                                    <!-- <Icon v-if="sampleData.length>1 && j == sampleData.length-1" class="icon-in-row" type="ios-remove-circle-outline" @click="deleteRow(itemRow,j)" size="14"></Icon> -->
-                                    <div>
-                                      {{itemRow.index}}
+                  <div style="display: flex"> 
+                      <div class="table-col" v-for="(itemCol,i) in sampleCol" :key="itemCol.key">
+                          <div class="table-row first">
+                            <Icon class="icon-in-th-left" type="ios-remove-circle-outline" @click="removeAll(itemCol.key)" size="14"></Icon>
+                            {{itemCol.name}}
+                            <Icon class="icon-in-th-right" type="ios-close-circle-outline" @click="deleteCol(itemCol,i)" size="14"></Icon>
+                            <Icon style="position: absolute; top: 0px; right: 0px" class="icon-in-th-right" type="ios-add-circle-outline" size="6" @click="showAddColModal(i)"></Icon>
+                          </div>
+                          <!-- <div class="table-row" :class="{'index':itemCol.key=='index'}" v-for="(itemRow,j) in list" :key="itemRow.index"> -->
+                          <div class="table-row" :class="{'index':itemCol.key=='index'}" v-for="(itemRow,j) in sampleData" :key="itemRow.index">
+                                <!-- <p>{{itemRow.index}}</p> -->
+                                <template v-if="itemCol.key!='index'">
+                                      <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="(itemCol.key.match('modification') && itemRow[itemCol.key].active) ? '':''" @on-enter ="showPTMsModal(itemCol,itemRow)" @on-change="getAutoCompleteList(itemCol,itemRow)" @on-focus="focus($event,itemCol,itemRow,j)" @on-blur="inputBlur(itemRow[itemCol.key])">
+                                      </Input>
+                                      <div class="copy-icon"><Icon @click="showCopyModal(itemRow,itemCol,j)" type="ios-copy-outline" size="16"></Icon></div>
+                                </template>
+                                <template v-else>
+                                    <!-- <Icon v-if="list.length>1" class="icon-in-row" type="ios-remove-circle-outline" @click="deleteRow(itemRow,j)" size="14"></Icon> -->
+                                    <Icon v-if="sampleData.length>1" class="icon-in-row" type="ios-remove-circle-outline" @click="deleteRow(itemRow,j)" size="14"></Icon>
+                                    <Icon style="position: absolute; bottom: 0px; left: 0px" class="icon-in-row" type="ios-add-circle-outline" size="6" @click="addRow(j)"></Icon>
+                                    <div class="index-col">
+                                        <div>
+                                          {{itemRow.index}}
+                                        </div>
                                     </div>
-                                    <!-- <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="itemRow[itemCol.key].value ? 'close-circled':''" @on-click ="removeInputContent(itemRow[itemCol.key])" @on-change="getAutoCompleteList(itemCol,itemRow)" @on-blur="inputBlur(itemRow[itemCol.key])">
-                                    </Input> -->
-                                    <!-- <span>{{itemRow.accession}}</span> -->
-                                </div>
-                            </template>
-                            
+                                </template>                
+                          </div>
                       </div>
                   </div>
+                  
                   <!-- <div :style="{'padding-top': (sampleData.length-rowEnd)*45+'px'}"></div> -->
-                  <div class="sample-table-extra add-row-icon">
-                    <!--  <Icon class="add-row-icon" type="plus-round" @click="addRow" size="20"></Icon><span>Add Sample</span> -->
-                  </div>
-                  <!-- <div :style="{'padding-top': rowStart*30+'px'}"></div> -->
+                  <!-- <div class="sample-table-extra add-row-icon">
+                     <Icon class="add-row-icon" type="plus-round" @click="addRow" size="20"></Icon><span>Add Sample</span>
+                  </div> -->
               </template>
           </div>
           <Dropdown class="dropdown-remote" :style="{left:dropdown.left + 'px', top:dropdown.top + 'px'}" trigger="custom" :visible="dropdown.visible" placement="bottom-end" @on-click="dropdownClick($event,dropdown.row[dropdown.col.key])">
               <DropdownMenu slot="list">
-                  <DropdownItem v-if="dropdownOptions.length == 0" name="nodata">No data
-                      <Icon class="apply-all-button" type="md-arrow-round-down" size="15" @click.stop="applyAll('no data',dropdown.col,dropdown.row,dropdown.index)"></Icon>
-                  </DropdownItem>
-                  <DropdownItem v-for="item in dropdownOptions" :name="item.name" :key="item.name">{{item.name}}
-                      <Icon class="apply-all-button" type="md-arrow-round-down" size="15" @click.stop="applyAll(item.name,dropdown.col,dropdown.row,dropdown.index)"></Icon>
-                  </DropdownItem>
+                  <DropdownItem v-if="dropdownLoading"><Spin></Spin></DropdownItem>
+                  <template v-else>
+                      <DropdownItem v-if="dropdownOptions.length == 0" name="nodata">No data
+                          <Icon class="apply-all-button" type="md-arrow-round-down" size="15" @click.stop="applyAll('no data',dropdown.col,dropdown.row,dropdown.index)"></Icon>
+                      </DropdownItem>
+                      <DropdownItem v-for="item in dropdownOptions" :name="item.name" :key="item.name">{{item.name}}
+                          <Icon class="apply-all-button" type="md-arrow-round-down" size="15" @click.stop="applyAll(item.name,dropdown.col,dropdown.row,dropdown.index)"></Icon>
+                      </DropdownItem>
+                  </template>
               </DropdownMenu>
           </Dropdown>
           <Spin class="table-spin" v-if="tableLoadingTemp"></Spin>  
@@ -79,6 +82,51 @@
           @on-ok="copy"
           @on-visible-change="copyModalVisibleChange">
           <Input id="text-to-copy" v-model="copyValue" type="textarea" placeholder="Enter something..." :rows="8"/>
+      </Modal>
+      <Modal
+          title="PTMs Choose"
+          v-model="ptmsModalBool"
+          :closable="false"
+          @on-ok="ptmsApply"
+          @on-cancel="ptmsCancel"
+          @on-visible-change="ptmsModalVisibleChange">
+          <Form :model="ptms" label-position="top">
+              <FormItem label="Input">
+                  <Input v-model="ptms.search" :disabled="true"></Input>
+              </FormItem>
+
+              <FormItem label="NT">
+                  <Select v-model="ptms.NT" @on-change="ntChange">
+                      <Option v-for="item in ntOptionsArray" :value="item.label">{{item.label}}</Option>
+                  </Select>
+              </FormItem>
+
+              <FormItem label="TA">
+                  <template v-if="taOptionsArray.length>0">
+                    <CheckboxGroup v-model="ptms.TA">
+                        <Checkbox style = "min-width: 40px" v-for="item in taOptionsArray" :label="item.label"></Checkbox>
+                    </CheckboxGroup>
+                  </template>
+                  <template v-else >
+                    <Input value="No Sites" :disabled="true"></Input>
+                  </template>
+              </FormItem>
+
+              <FormItem label="MT">
+                  <Select v-model="ptms.MT">
+                      <Option value="variable">variable</Option>
+                      <Option value="fixed">fixed</Option>
+                  </Select>
+              </FormItem>
+                  
+              <FormItem label="AC">
+                  <Input v-model="ptms.AC" :disabled="true"></Input>
+              </FormItem>
+
+              <FormItem label="Results">
+                  <Input class="ptmsResults-input" v-model="ptmsResults" :disabled="true"></Input>
+              </FormItem>
+          </Form>
       </Modal>
       <div v-if="drawerShowBool" class="annotate-drawer-container">
           <!-- <div class="annotate-drawer-wrapper" @wheel.stop="wheel" @wheel.prevent="wheel"> -->
@@ -213,6 +261,7 @@
           selectedFileItem:{},
           copyArray:[],
           copyModalBool:false,
+          ptmsModalBool:false,
           copyContent:'',
           copyValue:'',
           pasteIndex:null,
@@ -227,9 +276,23 @@
             type:null,
           },
           rowStart:0,
-          rowEnd:0,
+          rowEnd:75,
           tableLoading:false,
           colIndex:0,
+          ptms:{
+            search:'',
+            NT:'',
+            MT:'',
+            TA:[],
+            AC:'',
+          },
+          taOptionsArray:[],
+          ntOptionsArray:[{
+            key:'',
+            label:'',
+            taOptionsArray:[]
+          }],
+          dropdownLoading:false
           // start: 0,
           // end: 75
       }
@@ -241,6 +304,8 @@
     methods:{
           async getAutoCompleteList(itemCol,itemRow){
               console.log(itemCol,itemRow)
+              if(itemCol.key.match('modification'))
+                return
               if(!itemCol.searchable)
                   return
               let searchValue = itemRow[itemCol.key].value;
@@ -251,7 +316,10 @@
                   this.dropdown.visible = false;
                   return;
               }
-              this.dropdownOptions=[];
+
+              this.dropdownOptions=[]
+              this.dropdown.visible = true
+              this.dropdownLoading = true
               let query={
                 accession: itemCol.ontologyTerm.iri_id,
                 ontology: itemCol.ontologyTerm.ontology,
@@ -267,10 +335,11 @@
                         if(!itemRow[itemCol.key].active)
                           return;
 
-                        this.dropdown.visible = true
+                        this.dropdownLoading = false;
+
                         if(res.body.length>0 || searchValue){
                           itemRow[itemCol.key].dropdown=true;
-                          this.dropdown.visible = true
+                          // this.dropdown.visible = true
                         }
                         console.log('getAutoCompleteList',res.body)
                         this.dropdownOptions=res.body;
@@ -279,11 +348,11 @@
                         }
                     }
                     catch(e){
-                         //this.dropdown.visible = true
+                        this.dropdownLoading = false;
                         this.$Message.error({content:'Auto Comeplete Error', duration:2});
                         console.log(e)
                     }
-              }, 500);
+              }, 200);
               this.$forceUpdate();
           },
           titleCase(str) {
@@ -297,9 +366,9 @@
           },
           focus(e,itemCol,itemRow,index){
               let left = e.target.parentNode.parentNode.parentNode.offsetLeft-document.querySelector('.card-content').scrollLeft;
-              let top = e.target.parentNode.parentNode.offsetTop;
+              let top = e.target.parentNode.parentNode.offsetTop-document.querySelector('.card-content').scrollTop;
 
-              console.log('itemCol',itemCol)
+              //console.log('itemCol',itemCol)
 
               itemRow[itemCol.key].active=true;
 
@@ -324,7 +393,7 @@
             this.blur(item)
           },
           blur(item){
-              console.log('blurblur',item);
+              //console.log('blurblur',item);
               item.active=false;
               item.dropdown = false;
 
@@ -434,10 +503,7 @@
                   }
               });
           },
-          showCopyModal(row, col, index){//itemRow[itemCol.key],itemCol.key,j   //row col index
-           
-
-            //this.$Message.error({content:'Coming Soon', duration:2});
+          showCopyModal(row, col, index){
             this.pasteIndex = {
               row:row,
               col:col,
@@ -446,9 +512,6 @@
             this.copyValue='';
             this.copyArray=[];
             this.copyModalBool=true;
-          },
-          showPTMsModal(col,row){
-
           },
           copy(){
             document.querySelector('#text-to-copy textarea').select();
@@ -529,16 +592,19 @@
           applyAll(name,itemCol,itemRow,index){
                this.tableLoading=true;
                let tempValue = itemRow[itemCol.key].value;
+               console.log('tempValue',tempValue)
                this.dropdownClick(name,itemRow[itemCol.key]);
                this.$nextTick(()=>{ //make the value bind with the input first and then apply this value to all the other rows
                   for(let i=index;i<this.sampleData.length; i++){
                       let newItem =  JSON.parse(JSON.stringify(itemRow[itemCol.key]));
                       console.log('newItem',newItem)
-                      if(tempValue == this.sampleData[i][itemCol.key].value || !this.sampleData[i][itemCol.key].value){
-                        //TODO:
-                        this.sampleData[i][itemCol.key].value = newItem.value
-                        // this.sampleData[i][itemCol.key] = newItem;
-                      }
+                      this.sampleData[i][itemCol.key].value = newItem.value
+
+                      //TODO:here is the logic for applying all new values
+                      // if(tempValue == this.sampleData[i][itemCol.key].value || !this.sampleData[i][itemCol.key].value){
+                      //   //TODO:
+                      //   this.sampleData[i][itemCol.key].value = newItem.value
+                      // }
                       
                   }
                   this.blur(itemRow[itemCol.key]);
@@ -597,7 +663,137 @@
             this.msRunTableRowID = '';
             //this.selectedFileItem={};
           },
+          showPTMsModal(col,row){
+            this.ptmsResultsIndex = {
+              col:col,
+              row:row
+            }
+            this.tableLoading = true
+            this.getPTMsList(col,row)
+          },
+          async getPTMsList(itemCol,itemRow){
+              let searchValue = itemRow[itemCol.key].value;
+              console.log('searchValue',searchValue)
+              this.ptms.search = searchValue
+              this.ptms.NT = ''
+              this.ptms.MT = ''
+              this.ptms.TA = []
+              this.ptms.AC = ''
+              this.ptms.result = ''
+              if(!searchValue)
+                return
+              else{
+                let arr = searchValue.split(';')
+                for(let i in arr){
+                  if(arr[i].match('NT=')){
+                    this.ptms.NT = arr[i].slice(3)
+                  }
+                  if(arr[i].match('MT=')){
+                    this.ptms.MT = arr[i].slice(3)
+                  }
+                  if(arr[i].match('AC=')){
+                    this.ptms.AC = arr[i].slice(3)
+                  }
+                  if(arr[i].match('TA=')){
+                    this.ptms.TA = arr[i].slice(3).split(',')
+                  }
+                }
+              }
+
+              let query={
+                accession: itemCol.ontologyTerm.iri_id,
+                ontology: itemCol.ontologyTerm.ontology,
+                filter: this.ptms.NT || this.ptms.search //if NT is not found, just send all the content to backend
+              }
+              clearTimeout(this.timeoutId);
+              this.timeoutId = 0;
+              this.timeoutId = setTimeout( async()=> {
+                    try{
+                        let res = await this.$Api.getPTMsAttributes(query) 
+                        if(this.timeoutId == 0)
+                          return;
+                        if(!itemRow[itemCol.key].active)
+                          return;
+
+                        this.ptmsModalBool=true
+                        this.tableLoading=false
+
+                        if(res){
+                            this.ntOptionsArray = res
+                            //init taOptionsArray
+                            console.log('before initPtmsResults', this.ptms.NT)
+                            this.initPtmsResults(this.ptms.NT)
+                            console.log('this.taOptionsArray',this.ntOptionsArray)
+                        }
+                        else{
+                            this.$Message.error({content:'Invalid NT Valid', duration:2});
+                        }
+                    }
+                    catch(e){
+                        this.tableLoading=false
+                        this.$Message.error({content:'PTMs Comeplete Error', duration:2});
+                        console.log(e)
+                    }
+              }, 500);
+          },
+          ntChange(item){
+            this.ptms.TA=[]
+            this.ptms.AC = ''
+            console.log('ntChange')
+            this.initPtmsResults(item)
+          },
+          initPtmsResults(item){
+            this.taOptionsArray = []
+            let found = false
+            for(let i in this.ntOptionsArray){
+              if(this.ntOptionsArray[i].label == item){
+                found = true
+                console.log('found',this.ntOptionsArray[i])
+                for(let j in this.ntOptionsArray[i].taOptionsArray){
+                    let item = {
+                      key:this.ntOptionsArray[i].taOptionsArray[j].site,
+                      label:this.ntOptionsArray[i].taOptionsArray[j].site,
+                    }
+                    this.taOptionsArray.push(item)
+                }
+                this.ptms.AC = this.ntOptionsArray[i].key
+                break
+              }
+            }
+            if(!found){
+              //console.log(item)
+              //this.$Message.error({content:'Invalid NT', duration:2});
+            }
+          },
+          ptmsApply(){
+              if(this.ptmsResultsIndex){
+                this.ptmsResultsIndex.row[this.ptmsResultsIndex.col.key].value = this.ptmsResults
+              }
+              else{
+                this.$Message.error({content:'Apply Error', duration:2});
+              }
+              this.ptmsResultsIndex = null
+              this.ptms.search = ''
+              this.ptms.NT = ''
+              this.ptms.MT = ''
+              this.ptms.TA = []
+              this.ptms.AC = ''
+              this.ptms.result = ''
+          },
+          ptmsCancel(){
+            this.ptmsModalBool = false
+            this.ptmsResultsIndex = null
+            this.ptms.search = ''
+            this.ptms.NT = ''
+            this.ptms.MT = ''
+            this.ptms.TA = []
+            this.ptms.AC = ''
+            this.ptms.result = ''
+          },
           removeAnnotationFile(){
+
+          },
+          ptmsModalVisibleChange(){
 
           },
           wheel(e){
@@ -611,47 +807,41 @@
           // }
           scroll(e){
             // console.log('e',e)
-            // let scrollTop = e.target.scrollTop
-            // let scrollHeight = e.target.scrollHeight
-            // let clientHeight = e.target.clientHeight
+            let scrollTop = e.target.scrollTop
+            let scrollHeight = e.target.scrollHeight
+            let clientHeight = e.target.clientHeight
             // console.log('e',e)
             // console.log('scrollTop',scrollTop)
             // console.log('scrollHeight',scrollHeight)
             // console.log('clientHeight',clientHeight)
-            // let offset = (scrollTop + clientHeight) / scrollHeight
-            // let start = Math.max(Math.ceil(offset * this.sampleData.length) - 50, 0)
-            // this.rowStart = Math.min(start, this.sampleData.length - 75)
-            // this.rowEnd = this.rowStart + 75
+            let offset = (scrollTop + clientHeight) / scrollHeight
+            let start = Math.max(Math.ceil(offset * this.sampleData.length) - 50, 0)
+            this.rowStart = Math.min(start, this.sampleData.length - 75)
+            this.rowEnd = this.rowStart + 75
             // console.log(this.rowStart,this.rowEnd)
           }
     },
     watch: {
-        sampleData:{
-          handler(){
-            if(this.sampleData.length>0 || this.msRunArray.length>0){
-                setTimeout(()=>{
-                  this.$emit('update', this.sampleData)
-                },50)
-            }
-              
-          },
-          deep:true
-        },
-        sampleCol:{
-          handler(){
-            //console.log('sampleCol',this.sampleCol)
-          },
-          deep:true
-        },
-        data(oldValue, newValue){
+        // sampleData:{
+        //   handler(){
+            
+        //   },
+        //   deep:true
+        // },
+        // sampleCol:{
+        //   handler(){
+        //     //console.log('sampleCol',this.sampleCol)
+        //   },
+        //   deep:true
+        // },
+        data(newValue,oldValue){
             this.sampleData = cloneDeep(newValue)
-            console.log('this.sampleData',this.sampleData)
         },
-        columns(oldValue, newValue){
+        columns(newValue, oldValue){
             this.sampleCol = cloneDeep(newValue)
-            console.log('this.sampleCol',this.sampleCol)
+            // console.log('this.sampleCol',this.sampleCol)
         },
-        addedCol(oldValue, newValue){
+        addedCol(newValue,oldValue){
             //TODO:check if it is the oldValue
             for(let i in oldValue){
               let item = {
@@ -670,6 +860,18 @@
       tableLoadingTemp: function(){
         return (this.loading || this.tableLoading)
       },
+      ptmsResults: function(){
+        let NT = this.ptms.NT ? 'NT=' + this.ptms.NT + ';' : ''
+        let MT = this.ptms.MT ? 'MT=' + this.ptms.MT + ';' : ''
+        let TA = this.ptms.TA.length>0 ? 'TA=' + this.ptms.TA.toString() + ';' : ''
+        let AC = this.ptms.AC ? 'AC=' +  this.ptms.AC + ';' : ''
+        return (NT + MT + TA + AC).replace(/;$/gi,'')
+      },
+      list:function(){
+        // console.log('sample Data change',this.sampleData.slice(this.rowStart,this.rowEnd))
+        console.log(this.rowStart,this.rowEnd)
+        return this.sampleData.slice(this.rowStart,this.rowEnd)
+      }
     },
     mounted: function(){
       
@@ -720,7 +922,7 @@
       border-top: 1px solid #e9eaec;
       background-color: #f8f8f9;
       align-items: center;
-      height:40px; 
+      height:45px; 
       display: flex;
       white-space: nowrap;
       overflow: hidden;
@@ -1048,5 +1250,8 @@
     .addColModal .ivu-modal-body{
       max-height: 400px;
       overflow-y: scroll;
+    }
+    .ptmsResults-input input{
+        color: #2d8cf0 !important
     }
 </style>
