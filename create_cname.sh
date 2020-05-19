@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-echo 'annotator.multiomics.info' > ./dist/CNAME
+echo 'multiomics.info/annotator' > ./dist/CNAME
