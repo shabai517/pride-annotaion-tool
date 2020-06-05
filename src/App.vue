@@ -16,16 +16,16 @@ export default {
 
 <style>
 ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 10px;
+    height: 9px;
 }
 ::-webkit-scrollbar-track {
-    border-radius: 3px;
+    border-radius: 5px;
     background: rgba(0,0,0,0.06);
     -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.08);
 }
 ::-webkit-scrollbar-thumb {
-    border-radius: 3px;
+    border-radius: 5px;
     background: rgba(0,0,0,0.12);
     -webkit-box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
 }
