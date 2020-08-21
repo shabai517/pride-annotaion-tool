@@ -4,7 +4,7 @@
         <div class="action">
             <Button class="button" type="primary" @click="gotoPublicDataset" v-bind:disabled="true">Public Dataset</Button>
             <Button class="button" type="primary" @click="gotoNewDataset" v-bind:disabled="true">New Dataset</Button>
-            <Button class="button" type="primary" @click="gotosSRDF">Load SRDF</Button>
+            <Button class="button" type="primary" @click="gotosSRDF">Load SDRF</Button>
         </div>
         <div class="content">
             Read more about the SDRF file format <a href="https://github.com/bigbio/proteomics-metadata-standard/">here</a>
