@@ -812,37 +812,37 @@
 
           //   console.log(this.rowStart,this.rowEnd);
           // }
-          scroll(e){
-            // console.log('e',e)
-            let scrollTop = e.target.scrollTop
-            let scrollHeight = e.target.scrollHeight
-            let clientHeight = e.target.clientHeight
-            // console.log('e',e)
-            // console.log('scrollTop',scrollTop)
-            // console.log('scrollHeight',scrollHeight)
-            // console.log('clientHeight',clientHeight)
-            let offset = (scrollTop + clientHeight) / scrollHeight
-            let start = Math.max(Math.ceil(offset * this.sampleData.length) - 50, 0)
-            this.rowStart = Math.min(start, this.sampleData.length - 75)
-            this.rowEnd = this.rowStart + 75
-            // console.log(this.rowStart,this.rowEnd)
-          },
+          // scroll(e){ // do not use this way to render currently
+          //   // console.log('e',e)
+          //   let scrollTop = e.target.scrollTop
+          //   let scrollHeight = e.target.scrollHeight
+          //   let clientHeight = e.target.clientHeight
+          //   // console.log('e',e)
+          //   // console.log('scrollTop',scrollTop)
+          //   // console.log('scrollHeight',scrollHeight)
+          //   // console.log('clientHeight',clientHeight)
+          //   let offset = (scrollTop + clientHeight) / scrollHeight
+          //   let start = Math.max(Math.ceil(offset * this.sampleData.length) - 50, 0)
+          //   this.rowStart = Math.min(start, this.sampleData.length - 75)
+          //   this.rowEnd = this.rowStart + 75
+          //   // console.log(this.rowStart,this.rowEnd)
+          // },
           sdrfPageChange(page){
-              // this.tableLoading = true
-              // // console.log(123)
-              // this.pageSdrf = page;
-              // // this.sdrfTableData = this.sampleData.slice((this.pageSdrf-1)*this.pageSizeSdrf, (this.pageSdrf-1)*this.pageSizeSdrf + this.pageSizeSdrf)
-              // setTimeout(()=>{
-              //   this.tableLoading = false
-              // },500)
+              this.tableLoading = true
+              // console.log(123)
+              this.pageSdrf = page;
+              this.sdrfTableData = this.sampleData.slice((this.pageSdrf-1)*this.pageSizeSdrf, (this.pageSdrf-1)*this.pageSizeSdrf + this.pageSizeSdrf)
+              setTimeout(()=>{
+                this.tableLoading = false
+              },500)
           },  
           sdrfPageSizeChange(size){
-              // this.tableLoading = true
-              // this.pageSizeSdrf = size;
-              // // this.sdrfTableData = this.sampleData.slice((this.pageSdrf-1)*this.pageSizeSdrf, (this.pageSdrf-1)*this.pageSizeSdrf + this.pageSizeSdrf)
-              // setTimeout(()=>{
-              //   this.tableLoading = false
-              // },500)
+              this.tableLoading = true
+              this.pageSizeSdrf = size;
+              this.sdrfTableData = this.sampleData.slice((this.pageSdrf-1)*this.pageSizeSdrf, (this.pageSdrf-1)*this.pageSizeSdrf + this.pageSizeSdrf)
+              setTimeout(()=>{
+                this.tableLoading = false
+              },500)
           }
     },
     watch: {
