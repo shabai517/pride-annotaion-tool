@@ -13,8 +13,11 @@
   },
   "main": "background.js",
   "dependencies": {
+    "compressing": "^1.5.1",
     "core-js": "^2.6.5",
+    "jszip": "^3.5.0",
     "lodash": "^4.17.15",
+    "pako": "^2.0.2",
     "view-design": "^4.1.2",
     "vue": "^2.6.10",
     "vue-read-more": "^1.1.1",
