@@ -23,8 +23,8 @@
                             <Icon class="icon-in-th-right" type="ios-close-circle-outline" @click="deleteCol(itemCol,i)" size="14"></Icon>
                             <Icon style="position: absolute; top: 0px; right: 0px" class="icon-in-th-right" type="ios-add-circle-outline" size="6" @click="showAddColModal(i)"></Icon>
                           </div>
-                          <!-- <div class="table-row" :class="{'index':itemCol.key=='index'}" v-for="(itemRow,j) in list" :key="itemRow.index"> -->
-                          <div class="table-row" :class="{'index':itemCol.key=='index'}" v-for="(itemRow,j) in sampleData" :key="itemRow.index">
+                          <div class="table-row" :class="{'index':itemCol.key=='index'}" v-for="(itemRow,j) in list" :key="itemRow.index">
+                          <!-- <div class="table-row" :class="{'index':itemCol.key=='index'}" v-for="(itemRow,j) in sampleData" :key="itemRow.index"> -->
                                 <!-- <p>{{itemRow.index}}</p> -->
                                 <template v-if="itemCol.key!='index'">
                                       <Input :class="{inputError:!itemRow[itemCol.key].checked}" size="small" type="text" v-model="itemRow[itemCol.key].value" :icon="(itemCol.key.match('modification') && itemRow[itemCol.key].active) ? '':''" @on-enter ="showPTMsModal(itemCol,itemRow)" @on-change="getAutoCompleteList(itemCol,itemRow)" @on-focus="focus($event,itemCol,itemRow,j)" @on-blur="inputBlur(itemRow[itemCol.key])">
@@ -32,8 +32,8 @@
                                       <div class="copy-icon"><Icon @click="showCopyModal(itemRow,itemCol,j)" type="ios-copy-outline" size="16"></Icon></div>
                                 </template>
                                 <template v-else>
-                                    <!-- <Icon v-if="list.length>1" class="icon-in-row" type="ios-remove-circle-outline" @click="deleteRow(itemRow,j)" size="14"></Icon> -->
-                                    <Icon v-if="sampleData.length>1" class="icon-in-row" type="ios-remove-circle-outline" @click="deleteRow(itemRow,j)" size="14"></Icon>
+                                    <Icon v-if="list.length>1" class="icon-in-row" type="ios-remove-circle-outline" @click="deleteRow(itemRow,j)" size="14"></Icon>
+                                    <!-- <Icon v-if="sampleData.length>1" class="icon-in-row" type="ios-remove-circle-outline" @click="deleteRow(itemRow,j)" size="14"></Icon> -->
                                     <Icon style="position: absolute; bottom: 0px; left: 0px" class="icon-in-row" type="ios-add-circle-outline" size="6" @click="addRow(j)"></Icon>
                                     <div class="index-col">
                                         <div>
@@ -50,6 +50,10 @@
                      <Icon class="add-row-icon" type="plus-round" @click="addRow" size="20"></Icon><span>Add Sample</span>
                   </div> -->
               </template>
+              
+          </div>
+          <div class="page-container">
+            <Page v-if="sampleData.length > 0" :total="sampleData.length" :page-size="pageSizeSdrf" :current="pageSdrf" size="small" show-sizer show-total :page-size-opts="[100,200,300,400]" @on-change="sdrfPageChange" @on-page-size-change="sdrfPageSizeChange"></Page>
           </div>
           <Dropdown class="dropdown-remote" :style="{left:dropdown.left + 'px', top:dropdown.top + 'px'}" trigger="custom" :visible="dropdown.visible" placement="bottom-end" @on-click="dropdownClick($event,dropdown.row[dropdown.col.key])">
               <DropdownMenu slot="list">
@@ -292,7 +296,9 @@
             label:'',
             taOptionsArray:[]
           }],
-          dropdownLoading:false
+          dropdownLoading:false,
+          pageSizeSdrf:200,
+          pageSdrf:1,
           // start: 0,
           // end: 75
       }
@@ -463,7 +469,8 @@
                 }
             });
           },
-          addRow(index){
+          addRow(pageIndex){
+            let index = pageIndex + (this.pageSdrf-1)*this.pageSizeSdrf
             this.tableLoading = true
             let item={};
             for(let i=0;i<this.sampleCol.length;i++){
@@ -819,6 +826,23 @@
             this.rowStart = Math.min(start, this.sampleData.length - 75)
             this.rowEnd = this.rowStart + 75
             // console.log(this.rowStart,this.rowEnd)
+          },
+          sdrfPageChange(page){
+              // this.tableLoading = true
+              // // console.log(123)
+              // this.pageSdrf = page;
+              // // this.sdrfTableData = this.sampleData.slice((this.pageSdrf-1)*this.pageSizeSdrf, (this.pageSdrf-1)*this.pageSizeSdrf + this.pageSizeSdrf)
+              // setTimeout(()=>{
+              //   this.tableLoading = false
+              // },500)
+          },  
+          sdrfPageSizeChange(size){
+              // this.tableLoading = true
+              // this.pageSizeSdrf = size;
+              // // this.sdrfTableData = this.sampleData.slice((this.pageSdrf-1)*this.pageSizeSdrf, (this.pageSdrf-1)*this.pageSizeSdrf + this.pageSizeSdrf)
+              // setTimeout(()=>{
+              //   this.tableLoading = false
+              // },500)
           }
     },
     watch: {
@@ -836,10 +860,11 @@
         // },
         data(newValue,oldValue){
             this.sampleData = cloneDeep(newValue)
+            console.log('this.sampleData',this.sampleData)
         },
         columns(newValue, oldValue){
             this.sampleCol = cloneDeep(newValue)
-            // console.log('this.sampleCol',this.sampleCol)
+            console.log('this.sampleCol',this.sampleCol)
         },
         addedCol(newValue,oldValue){
             //TODO:check if it is the oldValue
@@ -869,8 +894,9 @@
       },
       list:function(){
         // console.log('sample Data change',this.sampleData.slice(this.rowStart,this.rowEnd))
-        console.log(this.rowStart,this.rowEnd)
-        return this.sampleData.slice(this.rowStart,this.rowEnd)
+        //console.log(this.rowStart,this.rowEnd)
+        //return this.sampleData.slice(this.rowStart,this.rowEnd)
+        return this.sampleData.slice((this.pageSdrf-1)*this.pageSizeSdrf, (this.pageSdrf-1)*this.pageSizeSdrf + this.pageSizeSdrf)
       }
     },
     mounted: function(){
@@ -1144,6 +1170,10 @@
     align-items: center;
     justify-content: center;
     width: 100%;
+  }
+  .page-container{
+    text-align: center;
+    margin-top: 20px;
   }
 </style>
 
