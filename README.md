@@ -1,4 +1,4 @@
-# pride-annotation
+# multiomics annotator tool 
 
 ## Project setup
 ```
