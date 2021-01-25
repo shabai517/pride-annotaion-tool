@@ -860,6 +860,8 @@
         // },
         data(newValue,oldValue){
             this.sampleData = cloneDeep(newValue)
+            this.pageSizeSdrf = 200
+            this.pageSdrf = 1
             console.log('this.sampleData',this.sampleData)
         },
         columns(newValue, oldValue){
