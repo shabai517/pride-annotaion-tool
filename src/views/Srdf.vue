@@ -65,37 +65,37 @@
     methods:{
       readFile(event){
         var files = event.target.files || event.dataTransfer.files;
-        if (!files.length)
-          return;
+        // if (!files.length)
+        //   return;
 
-        console.log('files',files)
-        let fileType = files[0].name
-        let path = files[0].path
-        if(fileType.indexOf('.gz')>0){ //for gz file
+        // console.log('files',files)
+        // let fileType = files[0].name
+        // let path = files[0].path
+        // if(fileType.indexOf('.gz')>0){ //for gz file
 
-            console.log('进入gz')
-            compressing.gzip.uncompress(path, '/Users/jbai/EBI/test.json')
-              .then(() => {
-                  console.log('success');
-                  fs.readFile('/Users/jbai/EBI/test.json', 'utf-8', function (err, data) {
-                    if (err) {
+        //     console.log('进入gz')
+        //     compressing.gzip.uncompress(path, '/Users/jbai/EBI/test.json')
+        //       .then(() => {
+        //           console.log('success');
+        //           fs.readFile('/Users/jbai/EBI/test.json', 'utf-8', function (err, data) {
+        //             if (err) {
                       
-                    } else {
-                      var obj = JSON.parse(data)
-                      console.log('json',obj)
-                    }
-                  });
+        //             } else {
+        //               var obj = JSON.parse(data)
+        //               console.log('json',obj)
+        //             }
+        //           });
                   
-              })
-              .catch(err => {
-                console.error(err);
-              });
-            // var result = pako.inflate(e.target.result, { to: 'string' });
+        //       })
+        //       .catch(err => {
+        //         console.error(err);
+        //       });
+        //     // var result = pako.inflate(e.target.result, { to: 'string' });
             
-            // await compressing.gzip.compressFile
-        }
-        else{ //for normal tsv file
-          console.log('进入tsv')
+        //     // await compressing.gzip.compressFile
+        // }
+        // else{ //for normal tsv file
+            console.log('进入tsv')
             let reader = new FileReader();
             reader.readAsText(files[0],'UTF-8');
             this.loading=true
@@ -189,7 +189,7 @@
                   console.log(e)
                 }
             };
-        }
+        // }
 
         
       },
