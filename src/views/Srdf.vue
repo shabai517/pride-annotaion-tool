@@ -63,6 +63,30 @@
       selfTable
     },
     methods:{
+      init(){
+        let tempSampleData = JSON.parse(localStorage.getItem("sampleData"));
+        let tempSampleCol = JSON.parse(localStorage.getItem("sampleCol"));
+        let tempAddedColData = JSON.parse(localStorage.getItem("addedColData"));
+        if(tempSampleData && tempSampleCol && tempAddedColData){
+          this.$Modal.confirm({
+              title: 'Hint',
+              content: '<p>Continue to annotate the last dataset?</p>',
+              onOk: () => {
+                  this.loading = true
+                  this.sampleData = tempSampleData;
+                  this.sampleCol = tempSampleCol
+                  this.addedCol = tempAddedColData
+                  setTimeout(()=>{
+                    this.loading = false
+                  },500)    
+              },
+              onCancel: () => {
+                  localStorage.clear();
+                  this.$Message.info('Dataset cleared!');
+              }
+          });
+        }
+      },
       readFile(event){
         var files = event.target.files || event.dataTransfer.files;
         // if (!files.length)
@@ -95,7 +119,7 @@
         //     // await compressing.gzip.compressFile
         // }
         // else{ //for normal tsv file
-            console.log('进入tsv')
+            // console.log('进入tsv')
             let reader = new FileReader();
             reader.readAsText(files[0],'UTF-8');
             this.loading=true
@@ -176,7 +200,7 @@
                         tempAddedCol.body[i].required = false
                     }
                     this.addedCol = tempAddedCol.body
-                    // console.log('addedCol',this.addedCol)
+                    console.log('addedCol',this.addedCol)
                     this.loading=false
 
                     //reset value for loading the same file
@@ -190,8 +214,6 @@
                 }
             };
         // }
-
-        
       },
       setClassName(name){
         if(name.match('sourcename') || name.match('characteristics'))
@@ -269,6 +291,7 @@
         window.onresize = () => {
           this.screenHeight = document.documentElement.clientHeight
         }
+        this.init()
     },
     created(){
 

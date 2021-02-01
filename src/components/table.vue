@@ -53,7 +53,7 @@
               
           </div>
           <div class="page-container">
-            <Page v-if="sampleData.length > 0" :total="sampleData.length" :page-size="pageSizeSdrf" :current="pageSdrf" size="small" show-sizer show-total :page-size-opts="[100,200,300,400]" @on-change="sdrfPageChange" @on-page-size-change="sdrfPageSizeChange"></Page>
+            <Page v-if="sampleData.length > 0" :total="sampleData.length" :page-size="pageSizeSdrf" :current="pageSdrf" size="small" show-sizer show-total :page-size-opts="[20,50,80,100]" @on-change="sdrfPageChange" @on-page-size-change="sdrfPageSizeChange"></Page>
           </div>
           <Dropdown class="dropdown-remote" :style="{left:dropdown.left + 'px', top:dropdown.top + 'px'}" trigger="custom" :visible="dropdown.visible" placement="bottom-end" @on-click="dropdownClick($event,dropdown.row[dropdown.col.key])">
               <DropdownMenu slot="list">
@@ -297,7 +297,7 @@
             taOptionsArray:[]
           }],
           dropdownLoading:false,
-          pageSizeSdrf:200,
+          pageSizeSdrf:50,
           pageSdrf:1,
           // start: 0,
           // end: 75
@@ -806,6 +806,22 @@
           wheel(e){
             //console.log(e)
           },
+          save(){
+              let sampleDataStr = JSON.stringify(this.sampleData);
+              let sampleColStr = JSON.stringify(this.sampleCol);
+              let addedColDataStr = JSON.stringify(this.addedColData);
+              console.log('save',this.sampleData,this.sampleCol,this.addedColData)
+              if(this.sampleData.length>0 && this.sampleCol.length>0 && this.addedColData.length>0){
+                this.localStorageItemAdd('sampleData', sampleDataStr);
+                this.localStorageItemAdd('sampleCol', sampleColStr);
+                this.localStorageItemAdd('addedColData', addedColDataStr);
+                this.$Message.success({content:'Save Successfully', duration:1});
+              }
+              else
+                this.$Message.error({content:'Save Error', duration:1});
+              
+              //let sampleDataB64 = Base64.encode(sampleDataStr)  TODO for backend.
+          },
           // pageChange(data){
           //   this.rowStart = (data.page-1)*data.pageSize;
           //   this.rowEnd = data.page*data.pageSize;
@@ -829,7 +845,7 @@
           // },
           sdrfPageChange(page){
               this.tableLoading = true
-              // console.log(123)
+              console.log('sdrfPageChange')
               this.pageSdrf = page;
               this.sdrfTableData = this.sampleData.slice((this.pageSdrf-1)*this.pageSizeSdrf, (this.pageSdrf-1)*this.pageSizeSdrf + this.pageSizeSdrf)
               setTimeout(()=>{
@@ -860,27 +876,30 @@
         // },
         data(newValue,oldValue){
             this.sampleData = cloneDeep(newValue)
-            this.pageSizeSdrf = 200
+            this.pageSizeSdrf = 50
             this.pageSdrf = 1
-            console.log('this.sampleData',this.sampleData)
+            // console.log('this.sampleData',this.sampleData)
         },
         columns(newValue, oldValue){
             this.sampleCol = cloneDeep(newValue)
-            console.log('this.sampleCol',this.sampleCol)
+            // console.log('this.sampleCol',this.sampleCol)
         },
         addedCol(newValue,oldValue){
+            // console.log('newValue',newValue)
+            // console.log('oldValue',oldValue)
             //TODO:check if it is the oldValue
-            for(let i in oldValue){
+            // for(let i in oldValue){
+            for(let i in newValue){
               let item = {
-                name:oldValue[i].name,
-                key:oldValue[i].name.replace(/\s+/g,"") + Math.floor(100000 + Math.random() * 900000),
+                name:newValue[i].name,
+                key:newValue[i].name.replace(/\s+/g,"") + Math.floor(100000 + Math.random() * 900000),
                 required:false,
-                searchable:oldValue[i].searchable,
+                searchable:newValue[i].searchable,
               }
               this.addedColData.push(item)
             }
             // console.log(oldValue)
-            // console.log(this.addedColData)
+            console.log('addedCol',this.addedColData)
         }
     },
     computed:{
